@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>チャット相談 モック</title>
+<style>
+  :root{
+    --bg:#eef0f4; --surface:#ffffff; --ink:#1c1d22; --muted:#6a7080; --line:#e2e5ec; --soft:#f4f5f8;
+    --accent:#2b3a8f; --accent-soft:#e8ebf7; --on-accent:#ffffff;
+    --warn:#b45309; --warn-soft:#fdf1e2; --ok:#1f7a4d; --ok-soft:#e3f3ea; --bubble-me:#2b3a8f; --bubble-them:#f0f1f5;
+    --discord:#5865f2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#111318; --surface:#1b1e25; --ink:#e8eaf0; --muted:#9aa1b2; --line:#2c313c; --soft:#232731;
+      --accent:#8d9cf2; --accent-soft:#262d4d; --on-accent:#0f1220;
+      --warn:#f0b35a; --warn-soft:#3a2b14; --ok:#6fd19b; --ok-soft:#173326; --bubble-me:#3b4db8; --bubble-them:#262a34;
+      --discord:#8d97ff;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#111318; --surface:#1b1e25; --ink:#e8eaf0; --muted:#9aa1b2; --line:#2c313c; --soft:#232731;
+    --accent:#8d9cf2; --accent-soft:#262d4d; --on-accent:#0f1220;
+    --warn:#f0b35a; --warn-soft:#3a2b14; --ok:#6fd19b; --ok-soft:#173326; --bubble-me:#3b4db8; --bubble-them:#262a34;
+    --discord:#8d97ff;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif; font-size:14px; line-height:1.6; padding-inline:16px; padding-block:24px 48px}
+  .wrap{max-width:1080px; margin:0 auto; display:flex; flex-direction:column; gap:20px}
+  h1,h2,h3{margin:0; text-wrap:balance}
+  .intro h1{font-size:22px; font-weight:700}
+  .intro p{margin:6px 0 0; color:var(--muted); max-width:70ch}
+  .badge{display:inline-block; font-size:11px; font-weight:700; letter-spacing:.06em; background:var(--warn-soft); color:var(--warn); padding:2px 8px; border-radius:99px; margin-bottom:6px}
+  .assume{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+  .assume span{font-size:12px; background:var(--surface); border:1px solid var(--line); border-radius:99px; padding:3px 10px}
+  .assume b{color:var(--accent)}
+
+  .sim{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center}
+  .sim .lbl{font-size:12px; color:var(--muted); font-weight:600; letter-spacing:.04em}
+  .seg{display:inline-flex; background:var(--soft); border-radius:10px; padding:3px; gap:2px; flex-wrap:wrap}
+  .seg button{border:0; background:none; font:inherit; font-size:13px; padding:6px 12px; border-radius:8px; color:var(--ink); cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.12); font-weight:700; color:var(--accent)}
+  .sim .reset{margin-left:auto}
+  button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  .stage{display:grid; grid-template-columns:minmax(0,380px) minmax(0,1fr); gap:20px; align-items:start}
+  @media (max-width:860px){ .stage{grid-template-columns:1fr} }
+  .pane-title{font-size:12px; font-weight:700; color:var(--muted); letter-spacing:.06em; margin:0 0 8px 4px}
+
+  /* お客様のスマホ */
+  .phone{background:var(--surface); border:1px solid var(--line); border-radius:28px; overflow:hidden; box-shadow:0 10px 30px rgba(20,24,40,.08); display:flex; flex-direction:column; height:680px; max-width:380px; width:100%}
+  .nav{display:flex; align-items:center; gap:8px; padding:14px 16px; border-bottom:1px solid var(--line); font-weight:700}
+  .nav .back{border:0; background:none; font:inherit; color:var(--accent); cursor:pointer; padding:0 4px; font-size:18px; line-height:1}
+  .nav .t{flex:1; text-align:center; margin-right:22px}
+  .screen{flex:1; overflow:auto; display:flex; flex-direction:column}
+  .cell{padding:14px 16px; border-bottom:1px solid var(--line)}
+  .cell .k{font-size:12px; color:var(--muted)}
+  .cell .v{font-weight:600; margin-top:2px}
+  .band{height:10px; background:var(--soft); border-bottom:1px solid var(--line)}
+  .sec{padding:14px 16px 6px; font-weight:700}
+  .choice{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0 16px 12px}
+  .choice button{border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:12px; font:inherit; text-align:left; cursor:pointer; color:var(--ink)}
+  .choice button .m{font-weight:700; font-size:15px}
+  .choice button .p{font-size:12px; color:var(--muted)}
+  .choice button[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
+  .slots{display:flex; flex-wrap:wrap; gap:8px; padding:0 16px 14px}
+  .slots button{border:1px solid var(--line); background:var(--surface); border-radius:10px; padding:8px 12px; font:inherit; cursor:pointer; color:var(--ink); font-variant-numeric:tabular-nums}
+  .slots button[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft); font-weight:700; color:var(--accent)}
+  .field{padding:0 16px 12px}
+  .field label{display:block; font-size:12px; color:var(--muted); margin-bottom:4px}
+  .field input{width:100%; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font:inherit; background:var(--surface); color:var(--ink)}
+  .cta{margin-top:auto; padding:12px 16px 16px; border-top:1px solid var(--line); background:var(--surface)}
+  .btn{display:block; width:100%; border:0; border-radius:99px; padding:13px; font:inherit; font-weight:700; background:var(--accent); color:var(--on-accent); cursor:pointer}
+  .btn.secondary{background:var(--accent-soft); color:var(--accent)}
+  .btn:disabled{opacity:.45; cursor:not-allowed}
+  .help{font-size:12px; color:var(--muted); text-align:center; margin-top:8px}
+  .pay-box{margin:16px; border:1px dashed var(--line); border-radius:14px; padding:16px; text-align:center; color:var(--muted); font-size:13px}
+  .pay-box .sum{font-size:22px; font-weight:800; color:var(--ink); margin:6px 0; font-variant-numeric:tabular-nums}
+  .done-head{padding:24px 16px 14px; text-align:center}
+  .done-icon{width:44px; height:44px; border-radius:50%; background:var(--ok-soft); color:var(--ok); display:inline-flex; align-items:center; justify-content:center; font-size:22px; font-weight:800}
+  .done-head h2{font-size:18px; margin-top:8px}
+  .done-head p{color:var(--muted); margin:4px 0 0; font-size:13px}
+  .url{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; word-break:break-all; color:var(--accent)}
+
+  /* チャット */
+  .timer{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 16px; font-size:13px; border-bottom:1px solid var(--line); background:var(--soft); font-variant-numeric:tabular-nums}
+  .timer.open{background:var(--ok-soft); color:var(--ok)}
+  .timer.last{background:var(--warn-soft); color:var(--warn)}
+  .timer.closed{background:var(--soft); color:var(--muted)}
+  .timer b{font-size:16px}
+  .msgs{flex:1; overflow:auto; padding:14px 12px; display:flex; flex-direction:column; gap:8px}
+  .msg{max-width:78%; padding:8px 12px; border-radius:16px; white-space:pre-wrap; word-break:break-word}
+  .msg.me{align-self:flex-end; background:var(--bubble-me); color:#fff; border-bottom-right-radius:4px}
+  .msg.them{align-self:flex-start; background:var(--bubble-them); border-bottom-left-radius:4px}
+  .msg .who{display:block; font-size:11px; opacity:.75; margin-bottom:2px}
+  .msg .img{display:block; width:160px; max-width:100%; aspect-ratio:4/3; border-radius:10px; background:linear-gradient(135deg,#c9d2f5,#e9dcc9); margin-top:4px}
+  .sys{align-self:center; font-size:12px; color:var(--muted); background:var(--soft); padding:4px 10px; border-radius:99px; text-align:center}
+  .composer{display:flex; gap:8px; align-items:flex-end; padding:10px 12px; border-top:1px solid var(--line)}
+  .composer textarea{flex:1; resize:none; border:1px solid var(--line); border-radius:18px; padding:8px 12px; font:inherit; min-height:38px; max-height:96px; background:var(--surface); color:var(--ink)}
+  .icon-btn{flex:none; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:var(--surface); cursor:pointer; font-size:16px; color:var(--muted)}
+  .send{flex:none; border:0; border-radius:18px; padding:9px 14px; background:var(--accent); color:var(--on-accent); font:inherit; font-weight:700; cursor:pointer}
+  .send:disabled,.icon-btn:disabled,.composer textarea:disabled{opacity:.45; cursor:not-allowed}
+  .locked{padding:24px 16px; text-align:center; color:var(--muted)}
+  .locked .big{font-size:30px; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; margin:6px 0}
+
+  /* 三原さんの管理画面 */
+  .admin{background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden; display:grid; grid-template-columns:230px minmax(0,1fr); height:680px}
+  @media (max-width:600px){ .admin{grid-template-columns:1fr; height:auto} .admin .list{border-right:0; border-bottom:1px solid var(--line)} .admin .room{height:560px} }
+  .list{border-right:1px solid var(--line); display:flex; flex-direction:column}
+  .list h3{font-size:13px; padding:14px 14px 8px; color:var(--muted)}
+  .item{padding:10px 14px; border-top:1px solid var(--line); cursor:pointer; background:none; border-left:0; border-right:0; border-bottom:0; text-align:left; font:inherit; color:var(--ink); width:100%}
+  .item[aria-current="true"]{background:var(--accent-soft)}
+  .item .n{font-weight:700; display:flex; justify-content:space-between; gap:6px}
+  .item .s{font-size:12px; color:var(--muted)}
+  .pill{font-size:11px; font-weight:700; padding:1px 8px; border-radius:99px; white-space:nowrap}
+  .pill.open{background:var(--ok-soft); color:var(--ok)}
+  .pill.wait{background:var(--soft); color:var(--muted)}
+  .pill.last{background:var(--warn-soft); color:var(--warn)}
+  .pill.done{background:var(--soft); color:var(--muted)}
+  .room{display:flex; flex-direction:column; min-height:0}
+  .room-head{padding:12px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:8px; align-items:center; flex-wrap:wrap}
+  .room-head .n{font-weight:700}
+  .room-head .s{font-size:12px; color:var(--muted)}
+  .discord{margin:0 0 0; padding:10px 14px; border-top:1px solid var(--line); background:var(--soft); font-size:12.5px}
+  .discord .h{font-weight:700; color:var(--discord); font-size:12px; margin-bottom:4px}
+  .discord .row{display:flex; gap:8px; align-items:flex-start; margin-top:4px}
+  .discord .ic{width:20px; height:20px; border-radius:6px; background:var(--discord); color:#fff; font-size:11px; display:inline-flex; align-items:center; justify-content:center; flex:none; font-weight:800}
+  .empty{color:var(--muted); font-size:12px}
+  .notes{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .notes h2{font-size:15px; margin-bottom:6px}
+  .notes ul{margin:0; padding-left:1.2em; color:var(--muted); display:flex; flex-direction:column; gap:4px}
+  @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto !important} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="intro">
+    <span class="badge">モック（見た目と流れの確認用）</span>
+    <h1>時間制チャット相談 モック</h1>
+    <p>お客様が時間を予約して前払いし、その時間だけ先生とチャットでやりとりできる仕組みの画面イメージです。お客様のスマホと先生の管理画面を並べています（スマホでは上下に表示）。「時間を進める」のボタンを押すと、開く前・開いている間・残り5分・終了後の違いを見られます。実際の予約・決済・送信はしません。名前・日付・料金はすべて例です。</p>
+    <div class="assume" aria-label="このモックの前提（打合せで変えられます）">
+      <span><b>前提</b>（打合せで変えられます）</span>
+      <span>予約した時間だけ開く</span>
+      <span>予約時にカードで前払い</span>
+      <span>30分／60分から選ぶ</span>
+      <span>先生はスマホの管理画面から返信・新着は通知</span>
+      <span>文字＋画像・ファイルを送れる</span>
+      <span>時間で自動終了・あとから見返せる</span>
+    </div>
+  </div>
+
+  <div class="sim" role="group" aria-label="時間のシミュレーション">
+    <span class="lbl">時間を進める</span>
+    <div class="seg" id="phaseSeg">
+      <button type="button" data-phase="before" aria-pressed="true">開始前</button>
+      <button type="button" data-phase="open" aria-pressed="false">開始（残り60分）</button>
+      <button type="button" data-phase="last" aria-pressed="false">残り5分</button>
+      <button type="button" data-phase="closed" aria-pressed="false">終了後</button>
+    </div>
+    <button type="button" class="btn secondary reset" id="resetBtn" style="width:auto;padding:8px 16px">最初から</button>
+  </div>
+
+  <div class="stage">
+    <div>
+      <div class="pane-title">お客様のスマホ</div>
+      <div class="phone" id="phone">
+        <div class="nav"><button type="button" class="back" id="backBtn" aria-label="戻る" hidden>‹</button><span class="t" id="navTitle">チャット相談のご予約</span></div>
+        <div class="screen" id="screen"></div>
+      </div>
+    </div>
+    <div>
+      <div class="pane-title">先生の管理画面（スマホでも開ける）</div>
+      <div class="admin">
+        <div class="list">
+          <h3>チャット相談（10/20）</h3>
+          <div id="adminList"></div>
+        </div>
+        <div class="room">
+          <div class="room-head"><div><div class="n" id="roomName">山田 太郎さん</div><div class="s" id="roomSub">10/20(火) 14:00〜15:00・60分・支払い済み</div></div><span class="pill wait" id="roomPill">開始前</span></div>
+          <div class="timer" id="adminTimer"></div>
+          <div class="msgs" id="adminMsgs" aria-live="polite"></div>
+          <div class="composer">
+            <textarea id="adminInput" rows="1" placeholder="返信を入力"></textarea>
+            <button type="button" class="send" id="adminSend">送信</button>
+          </div>
+          <div class="discord" aria-label="先生への新着通知の例">
+            <div class="h">先生への新着通知の例（メール・LINE など受け取り方は選べます）</div>
+            <div id="discordFeed"><span class="empty">お客様がメッセージを送ると、ここに通知の例が出ます</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <h2>例として仮置きしていること（打合せで決めます）</h2>
+    <ul>
+      <li>料金は例として 30 分 3,300 円・60 分 5,500 円と表示しています（長さ・金額は自由に決められます）</li>
+      <li>決済は実際には Stripe などの決済画面に移動します。このモックではカード情報を入力しません</li>
+      <li>サービス名・置き場所（先生のホームページからつなぐ など）は未定なので、見出しは「チャット相談」にしています</li>
+      <li>新着の通知先（メール・LINE など）と、予約時にお客様に聞く項目も未定です</li>
+      <li>チャットの URL・名前・やりとりはすべて例です</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var S = {
+    step:'menu', minutes:60, slot:'14:00', name:'山田 太郎', phase:'before', remain:3600, tick:null,
+    msgs:[], adminSel:0, discord:[]
+  };
+  var PRICE = {30:3300, 60:5500};
+  function yen(n){ return n.toLocaleString('ja-JP') + '円'; }
+  function endTime(){ var p=S.slot.split(':').map(Number); var m=p[0]*60+p[1]+S.minutes; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
+  function mmss(s){ s=Math.max(0,s); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+  function esc(t){ return String(t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function isOpen(){ return S.phase==='open' || S.phase==='last'; }
+
+  // ---------- お客様の画面 ----------
+  function render(){
+    var sc = $('screen'); var back=$('backBtn');
+    back.hidden = !(S.step==='pay');
+    if (S.step==='menu'){
+      $('navTitle').textContent='チャット相談のご予約';
+      sc.innerHTML =
+        '<div class="cell"><div class="k">メニュー</div><div class="v">先生へのチャット相談</div></div><div class="band"></div>'+
+        '<div class="sec">相談する長さ</div>'+
+        '<div class="choice" role="group" aria-label="相談する長さ">'+
+          [30,60].map(function(m){ return '<button type="button" data-min="'+m+'" aria-pressed="'+(S.minutes===m)+'"><div class="m">'+m+'分</div><div class="p">'+yen(PRICE[m])+'（例）</div></button>'; }).join('')+
+        '</div>'+
+        '<div class="sec">日時（10/20 火）</div>'+
+        '<div class="slots" role="group" aria-label="開始時刻">'+
+          ['10:00','11:30','14:00','16:00'].map(function(t){ return '<button type="button" data-slot="'+t+'" aria-pressed="'+(S.slot===t)+'">'+t+'</button>'; }).join('')+
+        '</div>'+
+        '<div class="field"><label for="nameIn">お名前</label><input id="nameIn" value="'+esc(S.name)+'" autocomplete="off"></div>'+
+        '<div class="cta"><button type="button" class="btn" id="toPay">'+S.slot+'〜'+endTime()+'（'+S.minutes+'分）で支払いへ進む</button><div class="help">時間になるとチャットが開き、'+S.minutes+'分で自動的に閉じます</div></div>';
+      sc.querySelectorAll('[data-min]').forEach(function(b){ b.onclick=function(){ S.minutes=+b.dataset.min; S.remain=S.minutes*60; render(); renderAdmin(); }; });
+      sc.querySelectorAll('[data-slot]').forEach(function(b){ b.onclick=function(){ S.slot=b.dataset.slot; render(); renderAdmin(); }; });
+      $('nameIn').oninput=function(e){ S.name=e.target.value || 'お客様'; renderAdmin(); };
+      $('toPay').onclick=function(){ S.step='pay'; render(); };
+    } else if (S.step==='pay'){
+      $('navTitle').textContent='お支払い';
+      sc.innerHTML =
+        '<div class="cell"><div class="k">ご予約内容</div><div class="v">10/20(火) '+S.slot+'〜'+endTime()+'（'+S.minutes+'分）</div></div>'+
+        '<div class="pay-box">お支払い金額（例）<div class="sum">'+yen(PRICE[S.minutes])+'</div>実際には、ここで Stripe などの決済画面に移動してカード払いをします。<br>このモックでは入力しません。</div>'+
+        '<div class="cta"><button type="button" class="btn" id="payBtn">支払いを済ませたことにする</button></div>';
+      $('payBtn').onclick=function(){ S.step='done'; render(); renderAdmin(); };
+    } else if (S.step==='done'){
+      $('navTitle').textContent='予約完了';
+      sc.innerHTML =
+        '<div class="done-head"><span class="done-icon" aria-hidden="true">✓</span><h2>ご予約とお支払いが完了しました</h2><p>時間になると、下のチャットが開きます</p></div><div class="band"></div>'+
+        '<div class="cell"><div class="k">日時</div><div class="v">10/20(火) '+S.slot+'〜'+endTime()+'（'+S.minutes+'分）</div></div>'+
+        '<div class="cell"><div class="k">お支払い</div><div class="v">'+yen(PRICE[S.minutes])+'（例）支払い済み</div></div>'+
+        '<div class="cell"><div class="k">あなた専用のチャット（ログイン不要）</div><div class="url">https://chat.example.jp/c/7Q2K-9X4M</div></div>'+
+        '<div class="cta"><button type="button" class="btn" id="openChat">チャットを開く</button><div class="help">同じURLは確認メールにも載せます</div></div>';
+      $('openChat').onclick=function(){ S.step='chat'; render(); };
+    } else {
+      $('navTitle').textContent='先生へのチャット相談';
+      sc.innerHTML = '<div class="timer" id="custTimer"></div>' + (S.phase==='before'
+        ? '<div class="locked" id="locked"></div>'
+        : '<div class="msgs" id="custMsgs" aria-live="polite"></div>') +
+        '<div class="composer"><button type="button" class="icon-btn" id="attachBtn" aria-label="画像・ファイルを送る">＋</button><textarea id="custInput" rows="1" placeholder="メッセージを入力"></textarea><button type="button" class="send" id="custSend">送信</button></div>';
+      $('custSend').onclick=function(){ send('them', $('custInput').value); $('custInput').value=''; };
+      $('attachBtn').onclick=function(){ send('them', '資料の写真です', true); };
+      renderChat();
+    }
+    syncTimers();
+  }
+
+  // ---------- チャット共通 ----------
+  function send(from, text, withImg){
+    text = (text||'').trim();
+    if (!isOpen() || (!text && !withImg)) return;
+    S.msgs.push({from:from, text:text, img:!!withImg});
+    if (from==='them') S.discord.unshift(S.name+'さん（'+S.minutes+'分・残り'+mmss(S.remain)+'）: '+(withImg?'［画像］':'')+text);
+    renderChat(); renderAdmin();
+  }
+  function bubbles(viewer){
+    var sys = [];
+    if (S.phase!=='before') sys.push('<div class="sys">'+S.slot+' チャットが開きました（'+S.minutes+'分）</div>');
+    var out = sys.concat(S.msgs.map(function(m){
+      var mine = (viewer==='customer' ? m.from==='them' : m.from==='me');
+      var who = m.from==='me' ? '先生' : S.name;
+      return '<div class="msg '+(mine?'me':'them')+'"><span class="who">'+esc(who)+'</span>'+esc(m.text)+(m.img?'<span class="img" role="img" aria-label="添付画像（例）"></span>':'')+'</div>';
+    }));
+    if (S.phase==='last') out.push('<div class="sys">残り5分です</div>');
+    if (S.phase==='closed') out.push('<div class="sys">'+endTime()+' チャットは終了しました。やりとりはいつでも見返せます</div>');
+    return out.join('');
+  }
+  function renderChat(){
+    var cm = $('custMsgs'); if (cm){ cm.innerHTML = bubbles('customer') || ''; cm.scrollTop = cm.scrollHeight; }
+    var lk = $('locked'); if (lk) lk.innerHTML = 'チャットは <b>10/20(火) '+S.slot+'</b> に開きます<div class="big">開始前</div>時間になると自動で入力できるようになります';
+    var ci=$('custInput'), cs=$('custSend'), ab=$('attachBtn');
+    [ci,cs,ab].forEach(function(e){ if(e) e.disabled = !isOpen(); });
+    if (ci) ci.placeholder = isOpen() ? 'メッセージを入力' : (S.phase==='closed' ? 'チャットは終了しました' : '開始時刻まで入力できません');
+  }
+  function timerHtml(){
+    if (S.phase==='before') return {cls:'', html:'<span>開始 10/20(火) '+S.slot+'</span><span>'+S.minutes+'分</span>'};
+    if (S.phase==='closed') return {cls:'closed', html:'<span>終了しました（'+S.slot+'〜'+endTime()+'）</span><span>閲覧のみ</span>'};
+    return {cls: S.phase==='last' ? 'last' : 'open', html:'<span>'+(S.phase==='last'?'まもなく終了':'チャット中')+'</span><span>残り <b>'+mmss(S.remain)+'</b></span>'};
+  }
+  function syncTimers(){
+    var t = timerHtml();
+    ['custTimer','adminTimer'].forEach(function(id){ var el=$(id); if(el){ el.className='timer '+t.cls; el.innerHTML=t.html; } });
+  }
+
+  // ---------- 管理画面 ----------
+  function statusPill(){
+    if (S.step==='menu' || S.step==='pay') return ['wait','予約前'];
+    return ({before:['wait','開始前'], open:['open','チャット中'], last:['last','残り5分'], closed:['done','終了']})[S.phase];
+  }
+  function renderAdmin(){
+    var p = statusPill();
+    var items = [
+      {n:S.name+'さん', s:'10/20 '+S.slot+'〜'+endTime()+'・'+S.minutes+'分', pill:p},
+      {n:'鈴木 花子さん', s:'10/20 16:00〜16:30・30分', pill:['wait','開始前']}
+    ];
+    $('adminList').innerHTML = items.map(function(it,i){ return '<button type="button" class="item" data-i="'+i+'" aria-current="'+(S.adminSel===i)+'"><span class="n">'+esc(it.n)+'<span class="pill '+it.pill[0]+'">'+it.pill[1]+'</span></span><span class="s">'+esc(it.s)+'</span></button>'; }).join('');
+    $('adminList').querySelectorAll('.item').forEach(function(b){ b.onclick=function(){ S.adminSel=+b.dataset.i; renderAdmin(); }; });
+    var cur = items[S.adminSel];
+    $('roomName').textContent = cur.n;
+    $('roomSub').textContent = cur.s + (S.adminSel===0 ? (S.step==='menu'||S.step==='pay' ? '・未払い' : '・支払い済み（例 '+yen(PRICE[S.minutes])+'）') : '・支払い済み（例 3,300円）');
+    $('roomPill').className = 'pill '+cur.pill[0]; $('roomPill').textContent = cur.pill[1];
+    var am = $('adminMsgs');
+    if (S.adminSel===0) { am.innerHTML = bubbles('admin') || '<div class="sys">開始前です。時間になると、ここでやりとりできます</div>'; }
+    else { am.innerHTML = '<div class="sys">16:00 に開きます</div>'; }
+    am.scrollTop = am.scrollHeight;
+    var canReply = S.adminSel===0 && isOpen();
+    $('adminInput').disabled = !canReply; $('adminSend').disabled = !canReply;
+    $('adminInput').placeholder = canReply ? '返信を入力' : 'チャット中だけ返信できます';
+    $('discordFeed').innerHTML = S.discord.length ? S.discord.slice(0,3).map(function(d){ return '<div class="row"><span class="ic">!</span><span>新着：'+esc(d)+'</span></div>'; }).join('') : '<span class="empty">お客様がメッセージを送ると、ここに通知の例が出ます</span>';
+    syncTimers();
+  }
+  $('adminSend').onclick=function(){ send('me', $('adminInput').value); $('adminInput').value=''; };
+
+  // ---------- 時間のシミュレーション ----------
+  function setPhase(ph){
+    S.phase = ph;
+    clearInterval(S.tick);
+    if (ph==='open') S.remain = S.minutes*60;
+    if (ph==='last') S.remain = 5*60;
+    if (ph==='closed') S.remain = 0;
+    if (isOpen()) S.tick = setInterval(function(){ S.remain--; if (S.remain<=300 && S.phase==='open'){ S.phase='last'; markSeg(); renderChat(); renderAdmin(); } if (S.remain<=0){ setPhase('closed'); } syncTimers(); }, 1000);
+    if (isOpen() && S.msgs.length===0) S.msgs.push({from:'me', text:'本日はよろしくお願いします！ご相談内容をどうぞ。', img:false});
+    markSeg();
+    if (S.step==='chat') render(); else renderChat();
+    renderAdmin();
+  }
+  function markSeg(){ $('phaseSeg').querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.phase===S.phase)); }); }
+  $('phaseSeg').querySelectorAll('button').forEach(function(b){ b.onclick=function(){ if (S.step!=='chat'){ S.step='chat'; } setPhase(b.dataset.phase); }; });
+  $('backBtn').onclick=function(){ S.step='menu'; render(); renderAdmin(); };
+  $('resetBtn').onclick=function(){ clearInterval(S.tick); S.step='menu'; S.minutes=60; S.slot='14:00'; S.name='山田 太郎'; S.phase='before'; S.remain=3600; S.msgs=[]; S.discord=[]; S.adminSel=0; markSeg(); render(); renderAdmin(); };
+
+  render(); renderAdmin();
+})();
+</script>
+
+</body>
+</html>

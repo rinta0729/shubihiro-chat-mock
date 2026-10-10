@@ -4,136 +4,265 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>チャット相談 モック</title>
+<title>時間制相談 モック</title>
 <style>
   :root{
     --bg:#eef0f4; --surface:#ffffff; --ink:#1c1d22; --muted:#6a7080; --line:#e2e5ec; --soft:#f4f5f8;
     --accent:#2b3a8f; --accent-soft:#e8ebf7; --on-accent:#ffffff;
-    --warn:#b45309; --warn-soft:#fdf1e2; --ok:#1f7a4d; --ok-soft:#e3f3ea; --bubble-me:#2b3a8f; --bubble-them:#f0f1f5;
-    --discord:#5865f2;
+    --warn:#b45309; --warn-soft:#fdf1e2; --ok:#1f7a4d; --ok-soft:#e3f3ea; --danger:#b42318; --danger-soft:#fdeceb;
+    --bubble-me:#2b3a8f; --on-bubble-me:#ffffff; --bubble-them:#f0f1f5;
+    --notify:#078a3e; --on-notify:#ffffff; --scrim:rgba(14,17,28,.45);
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
       color-scheme:dark;
       --bg:#111318; --surface:#1b1e25; --ink:#e8eaf0; --muted:#9aa1b2; --line:#2c313c; --soft:#232731;
       --accent:#8d9cf2; --accent-soft:#262d4d; --on-accent:#0f1220;
-      --warn:#f0b35a; --warn-soft:#3a2b14; --ok:#6fd19b; --ok-soft:#173326; --bubble-me:#3b4db8; --bubble-them:#262a34;
-      --discord:#8d97ff;
+      --warn:#f0b35a; --warn-soft:#3a2b14; --ok:#6fd19b; --ok-soft:#173326; --danger:#ff8a80; --danger-soft:#3a1d1b;
+      --bubble-me:#3b4db8; --on-bubble-me:#ffffff; --bubble-them:#262a34;
+      --notify:#5bd893; --on-notify:#0b1a12; --scrim:rgba(0,0,0,.6);
     }
   }
   :root[data-theme="dark"]{
     color-scheme:dark;
     --bg:#111318; --surface:#1b1e25; --ink:#e8eaf0; --muted:#9aa1b2; --line:#2c313c; --soft:#232731;
     --accent:#8d9cf2; --accent-soft:#262d4d; --on-accent:#0f1220;
-    --warn:#f0b35a; --warn-soft:#3a2b14; --ok:#6fd19b; --ok-soft:#173326; --bubble-me:#3b4db8; --bubble-them:#262a34;
-    --discord:#8d97ff;
+    --warn:#f0b35a; --warn-soft:#3a2b14; --ok:#6fd19b; --ok-soft:#173326; --danger:#ff8a80; --danger-soft:#3a1d1b;
+    --bubble-me:#3b4db8; --on-bubble-me:#ffffff; --bubble-them:#262a34;
+    --notify:#5bd893; --on-notify:#0b1a12; --scrim:rgba(0,0,0,.6);
   }
   *{box-sizing:border-box}
-  body{background:var(--bg); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif; font-size:14px; line-height:1.6; padding-inline:16px; padding-block:24px 48px}
-  .wrap{max-width:1080px; margin:0 auto; display:flex; flex-direction:column; gap:20px}
+  [hidden]{display:none !important}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif; font-size:14px; line-height:1.6; padding-inline:16px; padding-block:24px 48px}
+  .wrap{max-width:1120px; margin:0 auto; display:flex; flex-direction:column; gap:20px}
   h1,h2,h3{margin:0; text-wrap:balance}
+  a{color:var(--accent)}
+  .muted{color:var(--muted)}
+  .small{font-size:12px}
   .intro h1{font-size:22px; font-weight:700}
-  .intro p{margin:6px 0 0; color:var(--muted); max-width:70ch}
+  .intro p{margin:6px 0 0; color:var(--muted); max-width:72ch}
+  .intro .older{font-size:12px; margin-top:8px}
   .badge{display:inline-block; font-size:11px; font-weight:700; letter-spacing:.06em; background:var(--warn-soft); color:var(--warn); padding:2px 8px; border-radius:99px; margin-bottom:6px}
   .assume{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
   .assume span{font-size:12px; background:var(--surface); border:1px solid var(--line); border-radius:99px; padding:3px 10px}
   .assume b{color:var(--accent)}
 
-  .sim{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center}
+  .sim{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center}
   .sim .lbl{font-size:12px; color:var(--muted); font-weight:600; letter-spacing:.04em}
+  .sim .hint{flex-basis:100%; font-size:12px; color:var(--muted); margin:0}
   .seg{display:inline-flex; background:var(--soft); border-radius:10px; padding:3px; gap:2px; flex-wrap:wrap}
   .seg button{border:0; background:none; font:inherit; font-size:13px; padding:6px 12px; border-radius:8px; color:var(--ink); cursor:pointer}
   .seg button[aria-pressed="true"]{background:var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.12); font-weight:700; color:var(--accent)}
   .sim .reset{margin-left:auto}
-  button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .screen:focus{outline:none}
 
   .stage{display:grid; grid-template-columns:minmax(0,380px) minmax(0,1fr); gap:20px; align-items:start}
   @media (max-width:860px){ .stage{grid-template-columns:1fr} }
   .pane-title{font-size:12px; font-weight:700; color:var(--muted); letter-spacing:.06em; margin:0 0 8px 4px}
 
-  /* お客様のスマホ */
-  .phone{background:var(--surface); border:1px solid var(--line); border-radius:28px; overflow:hidden; box-shadow:0 10px 30px rgba(20,24,40,.08); display:flex; flex-direction:column; height:680px; max-width:380px; width:100%}
-  .nav{display:flex; align-items:center; gap:8px; padding:14px 16px; border-bottom:1px solid var(--line); font-weight:700}
-  .nav .back{border:0; background:none; font:inherit; color:var(--accent); cursor:pointer; padding:0 4px; font-size:18px; line-height:1}
-  .nav .t{flex:1; text-align:center; margin-right:22px}
-  .screen{flex:1; overflow:auto; display:flex; flex-direction:column}
-  .cell{padding:14px 16px; border-bottom:1px solid var(--line)}
-  .cell .k{font-size:12px; color:var(--muted)}
-  .cell .v{font-weight:600; margin-top:2px}
-  .band{height:10px; background:var(--soft); border-bottom:1px solid var(--line)}
-  .sec{padding:14px 16px 6px; font-weight:700}
-  .choice{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0 16px 12px}
-  .choice button{border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:12px; font:inherit; text-align:left; cursor:pointer; color:var(--ink)}
-  .choice button .m{font-weight:700; font-size:15px}
-  .choice button .p{font-size:12px; color:var(--muted)}
-  .choice button[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
-  .slots{display:flex; flex-wrap:wrap; gap:8px; padding:0 16px 14px}
-  .slots button{border:1px solid var(--line); background:var(--surface); border-radius:10px; padding:8px 12px; font:inherit; cursor:pointer; color:var(--ink); font-variant-numeric:tabular-nums}
-  .slots button[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft); font-weight:700; color:var(--accent)}
-  .field{padding:0 16px 12px}
-  .field label{display:block; font-size:12px; color:var(--muted); margin-bottom:4px}
-  .field input{width:100%; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font:inherit; background:var(--surface); color:var(--ink)}
-  .cta{margin-top:auto; padding:12px 16px 16px; border-top:1px solid var(--line); background:var(--surface)}
-  .btn{display:block; width:100%; border:0; border-radius:99px; padding:13px; font:inherit; font-weight:700; background:var(--accent); color:var(--on-accent); cursor:pointer}
+  /* 共通パーツ */
+  .btn{display:block; width:100%; border:0; border-radius:99px; padding:13px; font:inherit; font-weight:700; background:var(--accent); color:var(--on-accent); cursor:pointer; text-align:center}
   .btn.secondary{background:var(--accent-soft); color:var(--accent)}
+  .btn.danger{background:var(--danger-soft); color:var(--danger)}
+  .btn.small{display:inline-block; width:auto; padding:7px 14px; font-size:13px}
   .btn:disabled{opacity:.45; cursor:not-allowed}
-  .help{font-size:12px; color:var(--muted); text-align:center; margin-top:8px}
-  .pay-box{margin:16px; border:1px dashed var(--line); border-radius:14px; padding:16px; text-align:center; color:var(--muted); font-size:13px}
-  .pay-box .sum{font-size:22px; font-weight:800; color:var(--ink); margin:6px 0; font-variant-numeric:tabular-nums}
+  .linkbtn{border:0; background:none; font:inherit; font-size:12px; color:var(--accent); text-decoration:underline; text-underline-offset:2px; cursor:pointer; padding:6px 0}
+  .tag{display:inline-block; font-size:11px; font-weight:700; padding:1px 8px; border-radius:6px; background:var(--soft); color:var(--muted); border:1px solid var(--line); white-space:nowrap}
+  .tag.book{background:var(--accent-soft); color:var(--accent); border-color:transparent}
+  .tag.now{background:var(--warn-soft); color:var(--warn); border-color:transparent}
+  .pill{font-size:11px; font-weight:700; padding:1px 8px; border-radius:99px; white-space:nowrap}
+  .pill.open{background:var(--ok-soft); color:var(--ok)}
+  .pill.wait{background:var(--soft); color:var(--muted); border:1px solid var(--line)}
+  .pill.now{background:var(--warn); color:var(--surface)}
+  .pill.last{background:var(--warn-soft); color:var(--warn)}
+  .pill.done{background:var(--soft); color:var(--muted)}
+  .avatar{flex:none; width:40px; height:40px; border-radius:50%; background:var(--accent); color:var(--on-accent); display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:17px; line-height:1}
+  .avatar.lg{width:60px; height:60px; font-size:26px}
+  .avatar.xs{width:26px; height:26px; font-size:12px}
+  .ex{font-size:11px; color:var(--muted); white-space:nowrap}
+
+  /* 顧問先のスマホ */
+  .phone{position:relative; background:var(--surface); border:1px solid var(--line); border-radius:28px; overflow:hidden; box-shadow:0 10px 30px rgba(20,24,40,.08); display:flex; flex-direction:column; height:760px; max-width:380px; width:100%}
+  .nav{display:flex; align-items:center; gap:8px; padding:14px 16px; border-bottom:1px solid var(--line); font-weight:700; min-height:52px}
+  .nav .back{border:0; background:none; font:inherit; color:var(--accent); cursor:pointer; padding:0 4px; font-size:22px; line-height:1; width:22px}
+  .nav .back[hidden]{display:inline-block !important; visibility:hidden}
+  .nav .t{flex:1; text-align:center; margin-right:30px}
+  .screen{flex:1; overflow:auto; display:flex; flex-direction:column; min-height:0}
+  .screen.chatmode{overflow:hidden}
+  .cell{padding:12px 16px; border-bottom:1px solid var(--line)}
+  .cell .k{font-size:12px; color:var(--muted)}
+  .cell .v{font-weight:600; margin-top:2px; word-break:break-word}
+  .cell .sub{font-size:12px; color:var(--muted); margin-top:4px; word-break:break-word}
+  .band{height:10px; flex:none; background:var(--soft); border-bottom:1px solid var(--line)}
+  .sec{padding:14px 16px 8px; font-weight:700}
+  .sec .small{font-weight:400}
+  .note{margin:0 16px 12px; font-size:12px; color:var(--muted)}
+  .cta{margin-top:auto; padding:12px 16px 16px; border-top:1px solid var(--line); background:var(--surface); display:flex; flex-direction:column; gap:8px; position:sticky; bottom:0}
+  .help{font-size:12px; color:var(--muted); text-align:center}
+
+  .profile{display:flex; gap:12px; align-items:center; padding:16px}
+  .pname{font-weight:800; font-size:16px}
+  .pbio{font-size:12.5px; color:var(--muted); margin-top:2px}
+  .ticket{margin:0 16px; border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--soft)}
+  .tk-head{display:flex; justify-content:space-between; gap:8px; font-size:12px; color:var(--muted); font-weight:600}
+  .tk-num{display:flex; align-items:baseline; gap:4px; font-variant-numeric:tabular-nums}
+  .tk-num b{font-size:24px}
+  .tk-num span{color:var(--muted)}
+  .dots{display:flex; gap:5px; margin:6px 0 6px}
+  .dots i{flex:1; height:8px; border-radius:99px; background:var(--line)}
+  .dots i.on{background:var(--accent)}
+  .actions{padding:14px 16px 2px; display:grid; gap:8px}
+  .avail{font-size:12px; color:var(--muted); display:flex; gap:6px; align-items:center; justify-content:center; text-align:center}
+  .avail .dot{flex:none; width:8px; height:8px; border-radius:50%; background:var(--muted)}
+  .avail.on{color:var(--ok)} .avail.on .dot{background:var(--ok)}
+  .rv{margin:0 16px 10px; border:1px solid var(--line); border-radius:14px; padding:12px 14px}
+  .rv-top{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+  .rv-st{margin-left:auto; font-size:12px; color:var(--muted); font-weight:700}
+  .rv-st.on{color:var(--ok)}
+  .rv-when{font-weight:700; margin-top:6px; font-variant-numeric:tabular-nums}
+  .rv p{margin:6px 0 8px; font-size:13px; color:var(--muted)}
+  .rv .pending{background:var(--soft); border-radius:10px; padding:8px 10px; color:var(--ink)}
+  .rv .join{background:var(--ok-soft); border-radius:10px; padding:8px 10px; margin:6px 0 4px; color:var(--ink); font-size:13px}
+  .rv .join .k{font-size:12px; color:var(--ok); font-weight:700}
+  .rv .linkbtn{display:block}
+  .url{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; word-break:break-all; color:var(--accent)}
+  .empty-cell{margin:0 16px 10px; padding:12px; border:1px dashed var(--line); border-radius:12px; color:var(--muted); font-size:13px; text-align:center}
+
+  .steps{list-style:none; display:flex; gap:4px; margin:0; padding:12px 16px 2px}
+  .steps li{flex:1; min-width:0; text-align:center; font-size:11px; color:var(--muted); border-top:3px solid var(--line); padding-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .steps li.done{border-color:var(--accent); color:var(--accent)}
+  .steps li.cur{border-color:var(--accent); color:var(--ink); font-weight:700}
+  .choice{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; padding:0 16px 12px}
+  .choice button{border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:12px 8px; font:inherit; text-align:center; cursor:pointer; color:var(--ink)}
+  .choice button .m{font-weight:700; font-size:15px}
+  .choice button .p{font-size:11.5px; color:var(--muted); line-height:1.4; margin-top:2px}
+  .choice button[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft); box-shadow:inset 0 0 0 1px var(--accent)}
+  .choice button:disabled{opacity:.4; cursor:not-allowed}
+  .days,.slots{display:flex; flex-wrap:wrap; gap:8px; padding:0 16px 10px}
+  .days button,.slots button{border:1px solid var(--line); background:var(--surface); border-radius:10px; padding:8px 12px; font:inherit; cursor:pointer; color:var(--ink); font-variant-numeric:tabular-nums}
+  .days button[aria-pressed="true"],.slots button[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft); font-weight:700; color:var(--accent)}
+  .slots .none{font-size:12px; color:var(--muted)}
+  .field{padding:0 16px 12px}
+  .field label{display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; margin-bottom:4px}
+  .field textarea{display:block; width:100%; border:1px solid var(--line); border-radius:10px; padding:9px 12px; font:inherit; background:var(--surface); color:var(--ink); resize:vertical; min-height:40px}
+  .req{font-size:10px; background:var(--warn-soft); color:var(--warn); border-radius:4px; padding:0 6px; font-weight:700}
+  .opt{font-size:10px; color:var(--muted); font-weight:400}
+  .fill{padding:0 16px 4px}
+  .use{margin:12px 16px; border-radius:12px; background:var(--accent-soft); color:var(--accent); padding:12px 14px; display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:4px 10px}
+  .use b{font-size:16px}
+  .use span{font-size:12px; font-variant-numeric:tabular-nums}
   .done-head{padding:24px 16px 14px; text-align:center}
-  .done-icon{width:44px; height:44px; border-radius:50%; background:var(--ok-soft); color:var(--ok); display:inline-flex; align-items:center; justify-content:center; font-size:22px; font-weight:800}
+  .done-icon{width:46px; height:46px; border-radius:50%; background:var(--ok-soft); color:var(--ok); display:inline-flex; align-items:center; justify-content:center; font-size:22px; font-weight:800}
+  .done-icon.warn{background:var(--warn-soft); color:var(--warn)}
   .done-head h2{font-size:18px; margin-top:8px}
   .done-head p{color:var(--muted); margin:4px 0 0; font-size:13px}
-  .url{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; word-break:break-all; color:var(--accent)}
+  .howto{margin:14px 16px; padding:12px 14px; border-radius:12px; background:var(--soft); font-size:13px}
+  .howto b{display:block; margin-bottom:2px}
+  .waitbox{padding:26px 20px 12px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:4px}
+  .waitbox h2{font-size:17px; margin-top:10px}
+  .waitbox p{margin:0; color:var(--muted); font-size:13px}
+  .waitbox .big{font-size:30px; font-weight:800; font-variant-numeric:tabular-nums; margin-top:10px}
+  .quote{margin:14px 16px 0; text-align:left; background:var(--soft); border-radius:12px; padding:10px 12px; font-size:13px; word-break:break-word}
+  .quote .k{font-size:12px; color:var(--muted)}
+  .pulse{animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--accent-soft)} 50%{box-shadow:0 0 0 12px var(--accent-soft)}}
+
+  /* 初回の同意 */
+  .sheet-wrap{position:absolute; inset:0; background:var(--scrim); display:flex; align-items:flex-end; z-index:5}
+  .sheet{background:var(--surface); border-radius:22px 22px 0 0; padding:18px 18px 16px; width:100%; display:flex; flex-direction:column; gap:10px; box-shadow:0 -6px 20px rgba(0,0,0,.15)}
+  .sheet h3{font-size:16px}
+  .sheet ul{margin:0; padding-left:1.2em; display:flex; flex-direction:column; gap:6px; font-size:13px}
+  .sheet .small{margin:0}
 
   /* チャット */
-  .timer{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 16px; font-size:13px; border-bottom:1px solid var(--line); background:var(--soft); font-variant-numeric:tabular-nums}
+  .chat-head{display:flex; gap:10px; align-items:center; padding:10px 14px; border-bottom:1px solid var(--line); flex:none}
+  .chat-head .psub{font-size:12px; color:var(--muted)}
+  .chat-head .tag{margin-left:auto}
+  .timer{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 16px; font-size:13px; border-bottom:1px solid var(--line); background:var(--soft); font-variant-numeric:tabular-nums; flex:none}
   .timer.open{background:var(--ok-soft); color:var(--ok)}
   .timer.last{background:var(--warn-soft); color:var(--warn)}
   .timer.closed{background:var(--soft); color:var(--muted)}
   .timer b{font-size:16px}
-  .msgs{flex:1; overflow:auto; padding:14px 12px; display:flex; flex-direction:column; gap:8px}
-  .msg{max-width:78%; padding:8px 12px; border-radius:16px; white-space:pre-wrap; word-break:break-word}
-  .msg.me{align-self:flex-end; background:var(--bubble-me); color:#fff; border-bottom-right-radius:4px}
-  .msg.them{align-self:flex-start; background:var(--bubble-them); border-bottom-left-radius:4px}
+  .msgs{flex:1; overflow:auto; padding:14px 12px; display:flex; flex-direction:column; gap:8px; min-height:0}
+  .row{display:flex; gap:6px; align-items:flex-end}
+  .row.me{justify-content:flex-end}
+  .msg{max-width:80%; padding:8px 12px; border-radius:16px; white-space:pre-wrap; word-break:break-word}
+  .msg.me{background:var(--bubble-me); color:var(--on-bubble-me); border-bottom-right-radius:4px}
+  .msg.them{background:var(--bubble-them); border-bottom-left-radius:4px}
   .msg .who{display:block; font-size:11px; opacity:.75; margin-bottom:2px}
+  .msg.img-only{padding:4px; border-radius:14px}
+  .msg.img-only .who{padding:2px 6px 0}
+  .msg.img-only .img{margin-top:0}
   .msg .img{display:block; width:160px; max-width:100%; aspect-ratio:4/3; border-radius:10px; background:linear-gradient(135deg,#c9d2f5,#e9dcc9); margin-top:4px}
-  .sys{align-self:center; font-size:12px; color:var(--muted); background:var(--soft); padding:4px 10px; border-radius:99px; text-align:center}
-  .composer{display:flex; gap:8px; align-items:flex-end; padding:10px 12px; border-top:1px solid var(--line)}
-  .composer textarea{flex:1; resize:none; border:1px solid var(--line); border-radius:18px; padding:8px 12px; font:inherit; min-height:38px; max-height:96px; background:var(--surface); color:var(--ink)}
+  .sys{align-self:center; font-size:12px; color:var(--muted); background:var(--soft); padding:4px 10px; border-radius:12px; text-align:center; max-width:92%}
+  .sys.warn{background:var(--warn-soft); color:var(--warn)}
+  .locked{flex:1; padding:28px 16px; text-align:center; color:var(--muted)}
+  .locked .big{font-size:30px; font-weight:800; color:var(--ink); margin:6px 0}
+  .extend .btn{white-space:nowrap; flex:none}
+  .extend{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 12px; border-top:1px solid var(--line); font-size:12px; color:var(--muted); flex:none}
+  .composer{display:flex; gap:8px; align-items:flex-end; padding:10px 12px; border-top:1px solid var(--line); flex:none}
+  .composer textarea{flex:1; min-width:0; resize:none; border:1px solid var(--line); border-radius:18px; padding:8px 12px; font:inherit; min-height:38px; max-height:96px; background:var(--surface); color:var(--ink)}
   .icon-btn{flex:none; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:var(--surface); cursor:pointer; font-size:16px; color:var(--muted)}
   .send{flex:none; border:0; border-radius:18px; padding:9px 14px; background:var(--accent); color:var(--on-accent); font:inherit; font-weight:700; cursor:pointer}
   .send:disabled,.icon-btn:disabled,.composer textarea:disabled{opacity:.45; cursor:not-allowed}
-  .locked{padding:24px 16px; text-align:center; color:var(--muted)}
-  .locked .big{font-size:30px; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; margin:6px 0}
 
-  /* 三原さんの管理画面 */
-  .admin{background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden; display:grid; grid-template-columns:230px minmax(0,1fr); height:680px}
-  @media (max-width:600px){ .admin{grid-template-columns:1fr; height:auto} .admin .list{border-right:0; border-bottom:1px solid var(--line)} .admin .room{height:560px} }
-  .list{border-right:1px solid var(--line); display:flex; flex-direction:column}
-  .list h3{font-size:13px; padding:14px 14px 8px; color:var(--muted)}
-  .item{padding:10px 14px; border-top:1px solid var(--line); cursor:pointer; background:none; border-left:0; border-right:0; border-bottom:0; text-align:left; font:inherit; color:var(--ink); width:100%}
+  /* 先生の管理画面 */
+  .admin{background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden; display:flex; flex-direction:column}
+  .admin-bar{display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--line)}
+  .admin-bar .ttl{font-weight:700}
+  .admin-bar .ttl span{font-weight:400; color:var(--muted); font-size:12px; margin-left:6px}
+  .accept{display:flex; align-items:center; gap:8px; font-size:13px}
+  .switch{position:relative; width:46px; height:26px; border-radius:99px; border:0; background:var(--line); cursor:pointer; padding:0; flex:none}
+  .switch .knob{position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.3); transition:transform .15s}
+  .switch[aria-checked="true"]{background:var(--ok)}
+  .switch[aria-checked="true"] .knob{transform:translateX(20px)}
+  .state{font-weight:700; min-width:4em}
+  .state.on{color:var(--ok)} .state.off{color:var(--muted)}
+  .admin-body{display:grid; grid-template-columns:250px minmax(0,1fr); height:610px}
+  .list{border-right:1px solid var(--line); display:flex; flex-direction:column; overflow:auto; min-height:0}
+  .list h3{font-size:12px; padding:12px 14px 8px; color:var(--muted); letter-spacing:.04em}
+  .item{display:block; padding:10px 14px; border:0; border-top:1px solid var(--line); cursor:pointer; background:none; text-align:left; font:inherit; color:var(--ink); width:100%}
   .item[aria-current="true"]{background:var(--accent-soft)}
-  .item .n{font-weight:700; display:flex; justify-content:space-between; gap:6px}
-  .item .s{font-size:12px; color:var(--muted)}
-  .pill{font-size:11px; font-weight:700; padding:1px 8px; border-radius:99px; white-space:nowrap}
-  .pill.open{background:var(--ok-soft); color:var(--ok)}
-  .pill.wait{background:var(--soft); color:var(--muted)}
-  .pill.last{background:var(--warn-soft); color:var(--warn)}
-  .pill.done{background:var(--soft); color:var(--muted)}
-  .room{display:flex; flex-direction:column; min-height:0}
-  .room-head{padding:12px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:8px; align-items:center; flex-wrap:wrap}
-  .room-head .n{font-weight:700}
+  .item.alert{box-shadow:inset 3px 0 0 var(--warn)}
+  .item .n{font-weight:700; display:flex; justify-content:space-between; align-items:center; gap:6px}
+  .item .tags{display:flex; gap:4px; margin-top:3px; flex-wrap:wrap}
+  .item .s{display:block; font-size:12px; color:var(--muted); margin-top:2px; font-variant-numeric:tabular-nums}
+  .room{display:flex; flex-direction:column; min-height:0; min-width:0}
+  .room-head{padding:10px 14px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:8px; align-items:center; flex-wrap:wrap; flex:none}
+  .room-head .n{font-weight:700; display:flex; gap:8px; align-items:center; flex-wrap:wrap}
   .room-head .s{font-size:12px; color:var(--muted)}
-  .discord{margin:0 0 0; padding:10px 14px; border-top:1px solid var(--line); background:var(--soft); font-size:12.5px}
-  .discord .h{font-weight:700; color:var(--discord); font-size:12px; margin-bottom:4px}
-  .discord .row{display:flex; gap:8px; align-items:flex-start; margin-top:4px}
-  .discord .ic{width:20px; height:20px; border-radius:6px; background:var(--discord); color:#fff; font-size:11px; display:inline-flex; align-items:center; justify-content:center; flex:none; font-weight:800}
-  .empty{color:var(--muted); font-size:12px}
+  .room-actions{display:flex; gap:6px; flex-wrap:wrap}
+  .banner{margin:8px 12px 0; padding:8px 12px; border-radius:10px; background:var(--warn-soft); color:var(--warn); font-size:12.5px; font-weight:600; flex:none}
+  .intake{border-bottom:1px solid var(--line); flex:none}
+  .intake summary{padding:8px 14px; font-weight:700; font-size:13px; cursor:pointer}
+  .intake dl{margin:0; padding:0 14px 10px; display:grid; grid-template-columns:auto minmax(0,1fr); gap:3px 12px; font-size:12.5px; max-height:168px; overflow:auto}
+  .intake dt{color:var(--muted); white-space:nowrap}
+  .intake dd{margin:0; word-break:break-word}
+  .callinfo{flex:1; padding:16px; font-size:13px; overflow:auto}
+  .callinfo .box{border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--soft)}
+  .callinfo .box b{display:block; margin-bottom:4px}
+  .line-feed{border-top:1px solid var(--line); background:var(--soft); padding:10px 14px 14px}
+  .line-feed .h{font-weight:700; font-size:12.5px; color:var(--notify)}
+  .line-feed .hs{font-size:11.5px; color:var(--muted)}
+  .ln{display:flex; gap:8px; margin-top:8px; font-size:12.5px; align-items:flex-start}
+  .ln-ic{width:24px; height:24px; border-radius:8px; background:var(--notify); color:var(--on-notify); font-size:11px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; flex:none}
+  .ln-b{background:var(--surface); border:1px solid var(--line); border-radius:4px 12px 12px 12px; padding:6px 10px; min-width:0; word-break:break-word}
+  .ln-t{font-weight:700}
+  .ln-c{color:var(--muted); font-size:11.5px; margin-top:2px}
+
+  @media (max-width:600px){
+    .admin-body{grid-template-columns:1fr; height:auto}
+    .list{border-right:0; border-bottom:1px solid var(--line); max-height:290px}
+    .room{height:auto}
+    .room .msgs{flex:none; min-height:260px; max-height:380px}
+    .callinfo{flex:none}
+  }
+
   .notes{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
   .notes h2{font-size:15px; margin-bottom:6px}
   .notes ul{margin:0; padding-left:1.2em; color:var(--muted); display:flex; flex-direction:column; gap:4px}
-  @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto !important} }
+  @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto !important} .pulse{animation:none} .switch .knob{transition:none} }
 </style>
 </head>
 <body>
@@ -141,15 +270,17 @@
 <div class="wrap">
   <div class="intro">
     <span class="badge">モック（見た目と流れの確認用）</span>
-    <h1>時間制チャット相談 モック</h1>
-    <p>お客様が時間を予約して前払いし、その時間だけ先生とチャットでやりとりできる仕組みの画面イメージです。お客様のスマホと先生の管理画面を並べています（スマホでは上下に表示）。「時間を進める」のボタンを押すと、開く前・開いている間・残り5分・終了後の違いを見られます。実際の予約・決済・送信はしません。名前・日付・料金はすべて例です。</p>
-    <div class="assume" aria-label="このモックの前提（打合せで変えられます）">
-      <span><b>前提</b>（打合せで変えられます）</span>
-      <span>予約した時間だけ開く</span>
-      <span>予約時にカードで前払い</span>
-      <span>30分／60分から選ぶ</span>
-      <span>先生はスマホの管理画面から返信・新着は通知</span>
-      <span>文字＋画像・ファイルを送れる</span>
+    <h1>時間制相談 モック（チャット・Zoom・電話）</h1>
+    <p>佐藤先生の顧問先が、月ごとのチケット（30分＝1枚）の範囲で先生に相談する仕組みの画面イメージです。左が顧問先のスマホ（マイページ）、右が先生の管理画面です（スマホでは上下に並びます）。「予約する」「今すぐ相談する」から流れをたどれます。「時間を進める」を押すと、開始前・開始・残り5分・終了後の違いを見られます。実際の予約・送信・決済はしません。名前・日付・枚数・文章はすべて例です。</p>
+    <p class="older">前の案：<a href="v2.html">v2（カード前払い版）</a>・<a href="v1.html">v1（最初の案）</a></p>
+    <div class="assume" aria-label="このモックの前提（10/10の打合せの内容）">
+      <span><b>前提</b>（10/10の打合せの内容）</span>
+      <span>30分＝チケット1枚</span>
+      <span>システムでは決済しない（月の顧問料に含む）</span>
+      <span>チャット・Zoom・電話から選ぶ</span>
+      <span>予約の前に問診票</span>
+      <span>今すぐ相談は先生が受付中のときだけ</span>
+      <span>先生への通知は LINE グループ＋Google カレンダー</span>
       <span>時間で自動終了・あとから見返せる</span>
     </div>
   </div>
@@ -157,54 +288,90 @@
   <div class="sim" role="group" aria-label="時間のシミュレーション">
     <span class="lbl">時間を進める</span>
     <div class="seg" id="phaseSeg">
-      <button type="button" data-phase="before" aria-pressed="true">開始前</button>
-      <button type="button" data-phase="open" aria-pressed="false">開始（残り60分）</button>
+      <button type="button" data-phase="before" aria-pressed="false">開始前</button>
+      <button type="button" data-phase="open" aria-pressed="false">開始</button>
       <button type="button" data-phase="last" aria-pressed="false">残り5分</button>
       <button type="button" data-phase="closed" aria-pressed="false">終了後</button>
     </div>
-    <button type="button" class="btn secondary reset" id="resetBtn" style="width:auto;padding:8px 16px">最初から</button>
+    <button type="button" class="btn secondary small reset" id="resetBtn">最初から</button>
+    <p class="hint">いちばん新しい相談に効きます。まだ予約が無いときは、例の予約（チャット・60分）を作って進めます。</p>
   </div>
 
   <div class="stage">
     <div>
-      <div class="pane-title">お客様のスマホ</div>
+      <div class="pane-title">顧問先のスマホ（専用のマイページ・ログイン不要）</div>
       <div class="phone" id="phone">
-        <div class="nav"><button type="button" class="back" id="backBtn" aria-label="戻る" hidden>‹</button><span class="t" id="navTitle">チャット相談のご予約</span></div>
-        <div class="screen" id="screen"></div>
+        <div class="nav"><button type="button" class="back" id="backBtn" aria-label="戻る" hidden>‹</button><span class="t" id="navTitle">マイページ</span></div>
+        <div class="screen" id="screen" tabindex="-1"></div>
+        <div class="sheet-wrap" id="consent" hidden>
+          <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="consentTitle">
+            <h3 id="consentTitle">はじめにご確認ください</h3>
+            <ul>
+              <li>相談の内容・問診票・送った画像など、<b>健康に関する情報</b>を医師の佐藤に伝えることに同意します</li>
+              <li>この相談は<b>医療行為（診断・治療）ではなく、健康相談</b>です</li>
+            </ul>
+            <p class="small muted">利用規約・プライバシーポリシー（文面は準備中）</p>
+            <button type="button" class="btn" id="consentBtn">同意して使いはじめる</button>
+            <p class="help">この確認は最初の1回だけ出ます</p>
+          </div>
+        </div>
       </div>
     </div>
     <div>
-      <div class="pane-title">先生の管理画面（スマホでも開ける）</div>
-      <div class="admin">
-        <div class="list">
-          <h3>チャット相談（10/20）</h3>
-          <div id="adminList"></div>
+      <div class="pane-title">先生の管理画面（パソコン・スマホで開ける）</div>
+      <div class="admin" id="admin">
+        <div class="admin-bar">
+          <div class="ttl">相談の管理<span>医師 佐藤</span></div>
+          <div class="accept">
+            <span id="acceptLbl">今すぐ相談</span>
+            <button type="button" class="switch" id="acceptSw" role="switch" aria-checked="true" aria-labelledby="acceptLbl acceptTxt"><span class="knob"></span></button>
+            <span class="state on" id="acceptTxt">受付中</span>
+          </div>
         </div>
-        <div class="room">
-          <div class="room-head"><div><div class="n" id="roomName">山田 太郎さん</div><div class="s" id="roomSub">10/20(火) 14:00〜15:00・60分・支払い済み</div></div><span class="pill wait" id="roomPill">開始前</span></div>
-          <div class="timer" id="adminTimer"></div>
-          <div class="msgs" id="adminMsgs" aria-live="polite"></div>
-          <div class="composer">
-            <textarea id="adminInput" rows="1" placeholder="返信を入力"></textarea>
-            <button type="button" class="send" id="adminSend">送信</button>
+        <div class="admin-body">
+          <div class="list">
+            <h3>相談の一覧</h3>
+            <div id="adminList"></div>
           </div>
-          <div class="discord" aria-label="先生への新着通知の例">
-            <div class="h">先生への新着通知の例（メール・LINE など受け取り方は選べます）</div>
-            <div id="discordFeed"><span class="empty">お客様がメッセージを送ると、ここに通知の例が出ます</span></div>
+          <div class="room">
+            <div class="room-head">
+              <div><div class="n"><span id="roomName"></span><span class="pill" id="roomPill"></span></div><div class="s" id="roomSub"></div></div>
+              <div class="room-actions" id="roomActions"></div>
+            </div>
+            <div class="banner" id="roomAlert" role="status" hidden></div>
+            <details class="intake" id="intake" open>
+              <summary>問診票</summary>
+              <dl id="intakeBody"></dl>
+            </details>
+            <div class="timer" id="adminTimer"></div>
+            <div class="msgs" id="adminMsgs" aria-live="polite"></div>
+            <div class="callinfo" id="callInfo" hidden></div>
+            <div class="composer" id="adminComposer">
+              <button type="button" class="icon-btn" id="adminAttach" aria-label="画像を送る">＋</button>
+              <textarea id="adminInput" rows="1" aria-label="返信" placeholder="返信を入力"></textarea>
+              <button type="button" class="send" id="adminSend">送信</button>
+            </div>
           </div>
+        </div>
+        <div class="line-feed" aria-label="LINE グループへの通知の例">
+          <div class="h">LINE グループへの通知の例（bot が送ります）</div>
+          <div class="hs">予約・キャンセル・今すぐ相談の依頼・延長の希望・新着メッセージ（先生が管理画面を開いていないとき）・開始10分前。予定は相談用の Google カレンダーにも入ります</div>
+          <div id="lineFeed" aria-live="polite"></div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="notes">
-    <h2>例として仮置きしていること（打合せで決めます）</h2>
+    <h2>例として仮置きしていること（決まり次第差し替えます）</h2>
     <ul>
-      <li>料金は例として 30 分 3,300 円・60 分 5,500 円と表示しています（長さ・金額は自由に決められます）</li>
-      <li>決済は実際には Stripe などの決済画面に移動します。このモックではカード情報を入力しません</li>
-      <li>サービス名・置き場所（先生のホームページからつなぐ など）は未定なので、見出しは「チャット相談」にしています</li>
-      <li>新着の通知先（メール・LINE など）と、予約時にお客様に聞く項目も未定です</li>
-      <li>チャットの URL・名前・やりとりはすべて例です</li>
+      <li>月のチケット数は仮に 6 枚（3 時間）にしています。顧問料に対して月何枚にするかはこれから決めます</li>
+      <li>先生の写真・紹介文・最初のあいさつは例です（写真の代わりに「佐」のアイコンを出しています）</li>
+      <li>空き時間は、相談用の Google カレンダーで先生が「相談可」と入れた時間から 30 分刻みで出す想定です（このモックの枠は例）</li>
+      <li>予約は開始の1時間前まで・60日先まで。キャンセルは開始の1時間前までならマイページからでき、チケットは戻ります</li>
+      <li>Zoom は先生の固定の URL を表示する形から始めます。Zoom の URL・電話番号はどちらも例です</li>
+      <li>利用規約・プライバシーポリシーの文面はこれから用意します</li>
+      <li>顧問先のマイページは、顧問先ごとの専用 URL（ログイン不要）で開く想定です</li>
     </ul>
   </div>
 </div>
@@ -212,154 +379,664 @@
 <script>
 (function(){
   'use strict';
-  var $ = function(id){ return document.getElementById(id); };
-  var S = {
-    step:'menu', minutes:60, slot:'14:00', name:'山田 太郎', phase:'before', remain:3600, tick:null,
-    msgs:[], adminSel:0, discord:[]
-  };
-  var PRICE = {30:3300, 60:5500};
-  function yen(n){ return n.toLocaleString('ja-JP') + '円'; }
-  function endTime(){ var p=S.slot.split(':').map(Number); var m=p[0]*60+p[1]+S.minutes; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
-  function mmss(s){ s=Math.max(0,s); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
-  function esc(t){ return String(t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
-  function isOpen(){ return S.phase==='open' || S.phase==='last'; }
+  const $ = id => document.getElementById(id);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const pad = n => String(n).padStart(2,'0');
+  const mmss = s => { s = Math.max(0, s|0); return pad(Math.floor(s/60)) + ':' + pad(s%60); };
+  const toMin = t => { const p = t.split(':').map(Number); return p[0]*60 + p[1]; };
+  const toHM = m => pad(Math.floor(m/60)) + ':' + pad(m%60);
+  const trunc = (t, n) => { t = String(t || '').replace(/\s+/g,' ').trim(); return t.length > n ? t.slice(0, n) + '…' : t; };
 
-  // ---------- お客様の画面 ----------
-  function render(){
-    var sc = $('screen'); var back=$('backBtn');
-    back.hidden = !(S.step==='pay');
-    if (S.step==='menu'){
-      $('navTitle').textContent='チャット相談のご予約';
-      sc.innerHTML =
-        '<div class="cell"><div class="k">メニュー</div><div class="v">先生へのチャット相談</div></div><div class="band"></div>'+
-        '<div class="sec">相談する長さ</div>'+
-        '<div class="choice" role="group" aria-label="相談する長さ">'+
-          [30,60].map(function(m){ return '<button type="button" data-min="'+m+'" aria-pressed="'+(S.minutes===m)+'"><div class="m">'+m+'分</div><div class="p">'+yen(PRICE[m])+'（例）</div></button>'; }).join('')+
-        '</div>'+
-        '<div class="sec">日時（10/20 火）</div>'+
-        '<div class="slots" role="group" aria-label="開始時刻">'+
-          ['10:00','11:30','14:00','16:00'].map(function(t){ return '<button type="button" data-slot="'+t+'" aria-pressed="'+(S.slot===t)+'">'+t+'</button>'; }).join('')+
-        '</div>'+
-        '<div class="field"><label for="nameIn">お名前</label><input id="nameIn" value="'+esc(S.name)+'" autocomplete="off"></div>'+
-        '<div class="cta"><button type="button" class="btn" id="toPay">'+S.slot+'〜'+endTime()+'（'+S.minutes+'分）で支払いへ進む</button><div class="help">時間になるとチャットが開き、'+S.minutes+'分で自動的に閉じます</div></div>';
-      sc.querySelectorAll('[data-min]').forEach(function(b){ b.onclick=function(){ S.minutes=+b.dataset.min; S.remain=S.minutes*60; render(); renderAdmin(); }; });
-      sc.querySelectorAll('[data-slot]').forEach(function(b){ b.onclick=function(){ S.slot=b.dataset.slot; render(); renderAdmin(); }; });
-      $('nameIn').oninput=function(e){ S.name=e.target.value || 'お客様'; renderAdmin(); };
-      $('toPay').onclick=function(){ S.step='pay'; render(); };
-    } else if (S.step==='pay'){
-      $('navTitle').textContent='お支払い';
-      sc.innerHTML =
-        '<div class="cell"><div class="k">ご予約内容</div><div class="v">10/20(火) '+S.slot+'〜'+endTime()+'（'+S.minutes+'分）</div></div>'+
-        '<div class="pay-box">お支払い金額（例）<div class="sum">'+yen(PRICE[S.minutes])+'</div>実際には、ここで Stripe などの決済画面に移動してカード払いをします。<br>このモックでは入力しません。</div>'+
-        '<div class="cta"><button type="button" class="btn" id="payBtn">支払いを済ませたことにする</button></div>';
-      $('payBtn').onclick=function(){ S.step='done'; render(); renderAdmin(); };
-    } else if (S.step==='done'){
-      $('navTitle').textContent='予約完了';
-      sc.innerHTML =
-        '<div class="done-head"><span class="done-icon" aria-hidden="true">✓</span><h2>ご予約とお支払いが完了しました</h2><p>時間になると、下のチャットが開きます</p></div><div class="band"></div>'+
-        '<div class="cell"><div class="k">日時</div><div class="v">10/20(火) '+S.slot+'〜'+endTime()+'（'+S.minutes+'分）</div></div>'+
-        '<div class="cell"><div class="k">お支払い</div><div class="v">'+yen(PRICE[S.minutes])+'（例）支払い済み</div></div>'+
-        '<div class="cell"><div class="k">あなた専用のチャット（ログイン不要）</div><div class="url">https://chat.example.jp/c/7Q2K-9X4M</div></div>'+
-        '<div class="cta"><button type="button" class="btn" id="openChat">チャットを開く</button><div class="help">同じURLは確認メールにも載せます</div></div>';
-      $('openChat').onclick=function(){ S.step='chat'; render(); };
+  // ---------- 例のデータ ----------
+  const ME = '山田 太郎';
+  const TOTAL = 6;
+  const ZOOM_URL = 'https://zoom.us/j/0000000000（例）';
+  const TEL = '090-0000-0000（例）';
+  const METHOD = {chat:'チャット', zoom:'Zoom', phone:'電話'};
+  const METHOD_SUB = {chat:'文字・画像でやりとり', zoom:'先生の Zoom に入る', phone:'先生からお電話'};
+  const METHOD_NOTE = {
+    chat:'時間になるとチャットが開き、文字・画像でやりとりします。',
+    zoom:'時間になると、マイページに先生の Zoom の URL が出ます。',
+    phone:'時間になると、先生から登録の電話番号にお電話します。'
+  };
+  const LENS = [30, 60, 90];
+  const DAYS = [
+    {d:'10/20(火)', blocks:[['10:00','12:00'], ['14:00','17:00']]},
+    {d:'10/21(水)', blocks:[['19:00','21:00']]},
+    {d:'10/23(金)', blocks:[['13:00','15:30']]}
+  ];
+  const FIELDS = [
+    ['what', '相談したいこと', true, '例：2週間ほど前から寝つきが悪く、日中もだるい'],
+    ['since', 'いつ頃から', false, '例：2週間ほど前から'],
+    ['meds', '今飲んでいる薬・サプリ', false, '例：ビタミンD のサプリ'],
+    ['allergy', 'アレルギー', false, '例：なし'],
+    ['other', 'その他', false, '例：仕事が夜遅くまで続いています']
+  ];
+  const SAMPLE = {
+    what:'2週間ほど前から寝つきが悪く、日中もだるさが続いています。生活で気をつけることを知りたいです。',
+    since:'2週間ほど前から', meds:'ビタミンD のサプリ', allergy:'なし', other:'仕事が夜遅くまで続いています'
+  };
+  const SAMPLE_NOW = '昨日から肩こりと頭の重さがひどく、仕事に集中できません。今日できる対処を知りたいです。';
+  const greeting = s => '医師の佐藤です。' + (s.kind === 'now' ? 'ご相談の内容' : '問診票') + 'を拝見しました。本日はよろしくお願いします。気になっていることを、もう少し詳しく教えてください。';
+
+  let seq = 0;
+  const mk = o => Object.assign({id:'s' + (++seq), kind:'book', method:'chat', minutes:30, status:'before', form:{}, msgs:[], remain:0, waitRemain:600, extendReq:false, charged:false, mine:false, left:0}, o);
+
+  const S = {};
+  function initState(){
+    seq = 0;
+    const past = mk({who:ME, mine:true, date:'9/28(月)', slot:'20:00', minutes:30, status:'closed', charged:true,
+      form:{what:'寝つきが悪く、夜中に何度も目が覚める', since:'1か月ほど前から', meds:'なし', allergy:'なし', other:''}});
+    past.msgs = [
+      {from:'sys', text:'9/28(月) 20:00 相談が始まりました（30分）'},
+      {from:'doc', auto:true, text:greeting(past)},
+      {from:'cust', text:'夜中に2〜3回目が覚めて、そのあと眠れないことが多いです。'},
+      {from:'doc', text:'寝る前の過ごし方を一緒に見直してみましょう。まずは寝る1時間前から画面を見ない形で、1週間ためしてみてください。'},
+      {from:'sys', text:'20:30 相談は終了しました。やりとりはマイページからいつでも見返せます'}
+    ];
+    const o1 = mk({who:'鈴木 花子', method:'zoom', date:'10/20(火)', slot:'16:00', minutes:30, left:3, charged:true,
+      form:{what:'季節の変わり目で肌荒れが続いている。食事で気をつけることを知りたい', since:'2週間ほど前から', meds:'なし', allergy:'金属', other:''}});
+    const o2 = mk({who:'佐々木 健', method:'phone', date:'10/21(水)', slot:'19:00', minutes:60, left:1, charged:true,
+      form:{what:'健康診断で血圧が高めと言われた。運動と食事の相談をしたい', since:'今年の健康診断から', meds:'なし', allergy:'なし', other:'平日は夜しか時間が取れません'}});
+    Object.assign(S, {
+      step:'home', consent:false, accepting:true, left:4,
+      draft:{method:'chat', minutes:30, day:0, slot:null, form:{}},
+      nowText:'', viewId:null, activeId:null, adminSel:o1.id, lastBooked:null,
+      sessions:[past, o1, o2],
+      line:[{t:'予約が入りました', ex:true, b:'鈴木 花子さん／10/20(火) 16:00〜16:30／Zoom・30分（1枚）／相談：季節の変わり目で肌荒れが続いている…', c:'相談用カレンダーにも「鈴木 花子さん 相談（Zoom）」の予定を入れました'}]
+    });
+  }
+
+  const byId = id => S.sessions.find(s => s.id === id);
+  const endHM = s => toHM(toMin(s.slot) + s.minutes);
+  const range = s => s.date + ' ' + s.slot + '〜' + endHM(s);
+  const isOpen = s => !!s && (s.status === 'open' || s.status === 'last');
+  const leftOf = s => s.mine ? S.left : s.left;
+  const nTk = m => m / 30;
+
+  function slotsFor(dayIdx, minutes){
+    const day = DAYS[dayIdx], out = [];
+    const taken = S.sessions.filter(s => s.date === day.d && s.kind === 'book' && s.status !== 'canceled')
+      .map(s => [toMin(s.slot), toMin(s.slot) + s.minutes]);
+    day.blocks.forEach(b => {
+      for (let t = toMin(b[0]); t + minutes <= toMin(b[1]); t += 30){
+        if (!taken.some(x => t < x[1] && x[0] < t + minutes)) out.push(toHM(t));
+      }
+    });
+    return out;
+  }
+
+  function notify(t, b, c){
+    S.line.unshift({t:t, b:b, c:c || ''});
+    S.line = S.line.slice(0, 5);
+    renderLine();
+  }
+
+  // ---------- フォーカスを保ったまま描き直す ----------
+  function keyOf(el){
+    if (!el || el === document.body) return null;
+    if (el.id) return '#' + CSS.escape(el.id);
+    const k = ['data-act','data-aact','data-v','data-id'].filter(a => el.hasAttribute(a))
+      .map(a => '[' + a + '="' + CSS.escape(el.getAttribute(a)) + '"]').join('');
+    return k || null;
+  }
+  function keepFocus(container, fn){
+    const a = document.activeElement;
+    const inside = !!a && container.contains(a) && a !== container;
+    const k = inside ? keyOf(a) : null;
+    fn();
+    if (!inside) return;
+    const el = k ? container.querySelector(k) : null;
+    if (el && !el.disabled) el.focus({preventScroll:true});
+    else if (container.tabIndex >= 0 || container.id === 'screen') container.focus({preventScroll:true});
+  }
+
+  // ---------- 顧問先の画面 ----------
+  const FLOW = [['how','しかた'], ['len','長さ'], ['time','日時'], ['form','問診票'], ['confirm','確認']];
+  const TITLES = {home:'マイページ', how:'予約する', len:'予約する', time:'予約する', form:'予約する', confirm:'予約する', done:'予約完了', now:'今すぐ相談', wait:'今すぐ相談', nores:'今すぐ相談', chat:'相談チャット'};
+  const BACK = {how:'home', len:'how', time:'len', form:'time', confirm:'form', now:'home', nores:'home', chat:'home'};
+
+  function stepsHtml(cur){
+    const i = FLOW.findIndex(f => f[0] === cur);
+    return '<ol class="steps" aria-label="予約の手順">' + FLOW.map((f, k) =>
+      '<li class="' + (k < i ? 'done' : k === i ? 'cur' : '') + '"' + (k === i ? ' aria-current="step"' : '') + '>' + (k + 1) + ' ' + f[1] + '</li>').join('') + '</ol>';
+  }
+
+  function custStatus(s){
+    return ({before:['予約済み',''], waiting:['応答待ち',''], open:['相談中','on'], last:['残り5分','on'], closed:['終了','']})[s.status] || ['',''];
+  }
+
+  function cardHtml(s){
+    const st = custStatus(s);
+    let body = '';
+    if (s.method === 'chat'){
+      if (s.status === 'waiting') body = '<p>先生の応答を待っています（最大10分）</p><button type="button" class="btn small secondary" data-act="toWait" data-id="' + s.id + '">待っている画面を開く</button>';
+      else body = '<p>' + (isOpen(s) ? '相談中です。チャットを開いてやりとりできます' : '時間になると、ここからチャットに入れます') + '</p><button type="button" class="btn small' + (isOpen(s) ? '' : ' secondary') + '" data-act="openChat" data-id="' + s.id + '">チャットを開く</button>';
+    } else if (s.method === 'zoom'){
+      body = isOpen(s)
+        ? '<div class="join"><div class="k">先生の Zoom の URL</div><div class="url">' + esc(ZOOM_URL) + '</div><div class="small muted">開始時刻になりました。この URL から入ってください（モックのため開きません）</div></div>'
+        : '<p class="pending">時間になったらここに Zoom の URL が出ます</p>';
     } else {
-      $('navTitle').textContent='先生へのチャット相談';
-      sc.innerHTML = '<div class="timer" id="custTimer"></div>' + (S.phase==='before'
-        ? '<div class="locked" id="locked"></div>'
-        : '<div class="msgs" id="custMsgs" aria-live="polite"></div>') +
-        '<div class="composer"><button type="button" class="icon-btn" id="attachBtn" aria-label="画像・ファイルを送る">＋</button><textarea id="custInput" rows="1" placeholder="メッセージを入力"></textarea><button type="button" class="send" id="custSend">送信</button></div>';
-      $('custSend').onclick=function(){ send('them', $('custInput').value); $('custInput').value=''; };
-      $('attachBtn').onclick=function(){ send('them', '資料の写真です', true); };
-      renderChat();
+      body = isOpen(s)
+        ? '<div class="join"><div class="k">お電話中</div>先生から登録の番号（' + esc(TEL) + '）にお電話しています</div>'
+        : '<p class="pending">時間になったら先生からお電話します（登録の番号 ' + esc(TEL) + '）</p>';
+    }
+    const cancel = (s.kind === 'book' && s.status === 'before')
+      ? '<button type="button" class="linkbtn" data-act="cancel" data-id="' + s.id + '">キャンセルする（チケット' + nTk(s.minutes) + '枚が戻ります）</button>' : '';
+    return '<div class="rv"><div class="rv-top"><span class="tag ' + s.kind + '">' + (s.kind === 'now' ? '今すぐ' : '予約') + '</span><span class="tag">' + METHOD[s.method] + '</span><span class="rv-st ' + st[1] + '">' + st[0] + (isOpen(s) ? '・残り <span data-left="' + s.id + '">' + mmss(s.remain) + '</span>' : '') + '</span></div>' +
+      '<div class="rv-when">' + esc(range(s)) + '（' + s.minutes + '分・' + nTk(s.minutes) + '枚）</div>' + body + cancel + '</div>';
+  }
+
+  function pastHtml(s){
+    return '<div class="rv"><div class="rv-top"><span class="tag ' + s.kind + '">' + (s.kind === 'now' ? '今すぐ' : '予約') + '</span><span class="tag">' + METHOD[s.method] + '</span><span class="rv-st">終了</span></div>' +
+      '<div class="rv-when">' + esc(range(s)) + '（' + s.minutes + '分）</div>' +
+      (s.method === 'chat' ? '<p>' + esc(trunc(s.form.what, 28)) + '</p><button type="button" class="btn small secondary" data-act="openChat" data-id="' + s.id + '">やりとりを見返す</button>' : '<p>' + METHOD[s.method] + 'で相談しました</p>') + '</div>';
+  }
+
+  function homeHtml(){
+    const mine = S.sessions.filter(s => s.mine);
+    const upcoming = mine.filter(s => ['before','waiting','open','last'].includes(s.status));
+    const past = mine.filter(s => s.status === 'closed');
+    const busyNow = mine.some(s => s.kind === 'now' && ['waiting','open','last'].includes(s.status));
+    const canNow = S.accepting && S.left >= 1 && !busyNow;
+    let avail;
+    if (S.left < 1) avail = '<div class="avail"><span class="dot"></span>今月のチケットは使い切りました</div>';
+    else if (busyNow) avail = '<div class="avail on"><span class="dot"></span>今すぐ相談の依頼中・相談中です</div>';
+    else if (S.accepting) avail = '<div class="avail on"><span class="dot"></span>先生はいま受付中です（チャット・30分＝1枚から）</div>';
+    else avail = '<div class="avail"><span class="dot"></span>先生はいま今すぐ相談を受け付けていません。予約をご利用ください</div>';
+    return '' +
+      '<div class="profile"><span class="avatar lg" aria-hidden="true">佐</span><div><div class="pname">医師 佐藤</div><div class="pbio">健康と美容のご相談を担当しています。食事・睡眠・肌の悩みなど、お気軽にどうぞ。<span class="ex">（紹介文の例）</span></div></div></div>' +
+      '<div class="ticket"><div class="tk-head"><span>今月の残りチケット</span><span>10月分</span></div>' +
+        '<div class="tk-num"><b>残り ' + S.left + ' 枚</b><span>／' + TOTAL + ' 枚</span></div>' +
+        '<div class="dots" aria-hidden="true">' + Array.from({length:TOTAL}, (_, i) => '<i class="' + (i < S.left ? 'on' : '') + '"></i>').join('') + '</div>' +
+        '<div class="small muted">1枚＝30分。月が変わると新しい枚数になります（繰り越しなし）</div></div>' +
+      '<div class="actions">' +
+        '<button type="button" class="btn" data-act="book"' + (S.left >= 1 ? '' : ' disabled') + '>予約する</button>' +
+        '<button type="button" class="btn secondary" data-act="now"' + (canNow ? '' : ' disabled') + '>今すぐ相談する</button>' + avail +
+      '</div>' +
+      '<div class="sec">予約中の相談</div>' +
+      (upcoming.length ? upcoming.map(cardHtml).join('') : '<div class="empty-cell">予約中の相談はありません</div>') +
+      '<div class="sec">過去の相談</div>' +
+      (past.length ? past.map(pastHtml).join('') : '<div class="empty-cell">まだありません</div>');
+  }
+
+  function screenHtml(){
+    const d = S.draft;
+    switch (S.step){
+      case 'home': return homeHtml();
+      case 'how':
+        return stepsHtml('how') + '<div class="sec">相談のしかた</div>' +
+          '<div class="choice" role="group" aria-label="相談のしかた">' + ['chat','zoom','phone'].map(m =>
+            '<button type="button" data-act="method" data-v="' + m + '" aria-pressed="' + (d.method === m) + '"><div class="m">' + METHOD[m] + '</div><div class="p">' + METHOD_SUB[m] + '</div></button>').join('') + '</div>' +
+          '<p class="note">' + METHOD_NOTE[d.method] + '</p>' +
+          '<div class="cta"><button type="button" class="btn" data-act="next">次へ（長さを選ぶ）</button></div>';
+      case 'len':
+        return stepsHtml('len') + '<div class="sec">相談する長さ</div>' +
+          '<div class="choice" role="group" aria-label="相談する長さ">' + LENS.map(m => {
+            const n = nTk(m), dis = n > S.left;
+            return '<button type="button" data-act="len" data-v="' + m + '" aria-pressed="' + (d.minutes === m) + '"' + (dis ? ' disabled' : '') + '><div class="m">' + m + '分</div><div class="p">' + (dis ? 'チケットが足りません' : 'チケット' + n + '枚') + '</div></button>';
+          }).join('') + '</div>' +
+          '<p class="note">いまの残りは <b>' + S.left + '枚</b> です。この画面でのお支払いはありません（月の顧問料に含まれています）。</p>' +
+          '<div class="cta"><button type="button" class="btn" data-act="next">次へ（日時を選ぶ）</button></div>';
+      case 'time': {
+        const slots = slotsFor(d.day, d.minutes);
+        const day = DAYS[d.day].d;
+        return stepsHtml('time') + '<div class="sec">日にち</div>' +
+          '<div class="days" role="group" aria-label="日にち">' + DAYS.map((x, i) => '<button type="button" data-act="day" data-v="' + i + '" aria-pressed="' + (d.day === i) + '">' + x.d + '</button>').join('') + '</div>' +
+          '<div class="sec">開始時刻 <span class="small muted">（' + d.minutes + '分の相談が入る枠）</span></div>' +
+          '<div class="slots" role="group" aria-label="開始時刻">' + (slots.length ? slots.map(t => '<button type="button" data-act="slot" data-v="' + t + '" aria-pressed="' + (d.slot === t) + '">' + t + '</button>').join('') : '<span class="none">この日は空きがありません。別の日を選んでください</span>') + '</div>' +
+          '<p class="note">先生が相談用カレンダーで「相談可」にした時間から、30分刻みで出しています（枠は例）。開始の1時間前・60日先まで予約できます。</p>' +
+          '<div class="cta"><button type="button" class="btn" data-act="next"' + (d.slot ? '' : ' disabled') + '>' + (d.slot ? day + ' ' + d.slot + '〜' + toHM(toMin(d.slot) + d.minutes) + ' で次へ' : '開始時刻を選んでください') + '</button></div>';
+      }
+      case 'form': {
+        const ok = !!(d.form.what || '').trim();
+        return stepsHtml('form') + '<div class="sec">問診票 <span class="small muted">先生が事前に準備するために使います</span></div>' +
+          '<div class="fill"><button type="button" class="linkbtn" data-act="fill">入力例を入れる（モック用）</button></div>' +
+          FIELDS.map(f => '<div class="field"><label for="f_' + f[0] + '">' + f[1] + (f[2] ? '<span class="req">必須</span>' : '<span class="opt">（任意）</span>') + '</label><textarea id="f_' + f[0] + '" data-field="' + f[0] + '" rows="' + (f[0] === 'what' ? 3 : 1) + '" placeholder="' + esc(f[3]) + '">' + esc(d.form[f[0]] || '') + '</textarea></div>').join('') +
+          '<div class="cta"><button type="button" class="btn" data-act="next" id="formNext"' + (ok ? '' : ' disabled') + '>確認へ進む</button><div class="help">「相談したいこと」だけ必須です</div></div>';
+      }
+      case 'confirm': {
+        const n = nTk(d.minutes), day = DAYS[d.day].d;
+        const others = FIELDS.slice(1).filter(f => (d.form[f[0]] || '').trim()).map(f => '<div class="sub">' + f[1] + '：' + esc(trunc(d.form[f[0]], 40)) + '</div>').join('');
+        return stepsHtml('confirm') +
+          '<div class="cell"><div class="k">相談のしかた</div><div class="v">' + METHOD[d.method] + '</div></div>' +
+          '<div class="cell"><div class="k">日時</div><div class="v">' + day + ' ' + d.slot + '〜' + toHM(toMin(d.slot) + d.minutes) + '（' + d.minutes + '分）</div></div>' +
+          '<div class="cell"><div class="k">問診票</div><div class="v">' + esc(trunc(d.form.what, 70)) + '</div>' + others + '</div>' +
+          '<div class="use"><b>チケットを ' + n + ' 枚使います</b><span>残り ' + S.left + ' 枚 → ' + (S.left - n) + ' 枚</span></div>' +
+          '<p class="note">キャンセルは開始の1時間前までならマイページからでき、チケットは戻ります。</p>' +
+          '<div class="cta"><button type="button" class="btn" data-act="confirm">この内容で予約する</button><div class="help">お支払いの画面はありません</div></div>';
+      }
+      case 'done': {
+        const s = byId(S.lastBooked);
+        const howto = {
+          chat:'<b>チャットで相談</b>時間になったら、マイページの「チャットを開く」から入れます。先生からのあいさつが届いたら始まりです。',
+          zoom:'<b>Zoom で相談</b>時間になったら、マイページに Zoom の URL が出ます。そこから入ってください。',
+          phone:'<b>電話で相談</b>時間になったら先生からお電話します（登録の番号 ' + esc(TEL) + '）。'
+        }[s.method];
+        return '<div class="done-head"><span class="done-icon" aria-hidden="true">✓</span><h2>予約しました</h2><p>チケットを ' + nTk(s.minutes) + ' 枚使いました（残り ' + S.left + ' 枚）</p></div><div class="band"></div>' +
+          '<div class="cell"><div class="k">日時</div><div class="v">' + esc(range(s)) + '（' + s.minutes + '分）</div></div>' +
+          '<div class="cell"><div class="k">相談のしかた</div><div class="v">' + METHOD[s.method] + '</div></div>' +
+          '<div class="howto">' + howto + '</div>' +
+          '<div class="cta"><button type="button" class="btn" data-act="home">マイページに戻る</button><div class="help">予約の内容はマイページでいつでも確認できます</div></div>';
+      }
+      case 'now':
+        return '<div class="profile"><span class="avatar" aria-hidden="true">佐</span><div><div class="pname">医師 佐藤</div><div class="avail on" style="justify-content:flex-start"><span class="dot"></span>いま受付中です</div></div></div>' +
+          '<div class="sec">今すぐ相談 <span class="small muted">チャット・30分＝チケット1枚</span></div>' +
+          '<div class="fill"><button type="button" class="linkbtn" data-act="fillNow">入力例を入れる（モック用）</button></div>' +
+          '<div class="field"><label for="nowText">相談したいこと<span class="req">必須</span></label><textarea id="nowText" data-field="now" rows="4" placeholder="例：昨日から肩こりと頭の重さがひどい">' + esc(S.nowText) + '</textarea></div>' +
+          '<p class="note">先生が「開始する」を押すとチャットが始まり、チケットを1枚使います。10分以内に応答がないときは、チケットは使いません。</p>' +
+          '<div class="cta"><button type="button" class="btn" data-act="sendNow" id="nowNext"' + (S.nowText.trim() ? '' : ' disabled') + '>先生に依頼する</button></div>';
+      case 'wait': {
+        const s = byId(S.viewId);
+        return '<div class="waitbox"><span class="avatar lg pulse" aria-hidden="true">佐</span><h2>先生の応答を待っています</h2><p>最大10分お待ちください。<br>先生が「開始する」を押すとチャットが始まります。</p>' +
+          '<div class="big" id="waitLeft">' + mmss(s.waitRemain) + '</div><div class="small muted">応答の締め切りまで</div></div>' +
+          '<div class="quote"><div class="k">送った内容</div>' + esc(s.form.what) + '</div>' +
+          '<div class="cta"><button type="button" class="btn secondary" data-act="cancelNow">依頼を取り消す</button><button type="button" class="linkbtn" data-act="timeout">（モック）10分たって応答がなかった場合を見る</button></div>';
+      }
+      case 'nores':
+        return '<div class="waitbox"><span class="done-icon warn" aria-hidden="true">!</span><h2>ただいま対応できません</h2><p>予約をご利用ください。<br>今回の依頼ではチケットは使っていません。</p></div>' +
+          '<div class="cta"><button type="button" class="btn" data-act="book"' + (S.left >= 1 ? '' : ' disabled') + '>予約する</button><button type="button" class="btn secondary" data-act="home">マイページに戻る</button></div>';
+      case 'chat': {
+        const s = byId(S.viewId);
+        return '<div class="chat-head"><span class="avatar" aria-hidden="true">佐</span><div><div class="pname">医師 佐藤</div><div class="psub">医師の佐藤が対応します</div></div><span class="tag" id="custLen">' + s.minutes + '分</span></div>' +
+          '<div class="timer" id="custTimer"></div>' +
+          '<div class="msgs" id="custMsgs" aria-live="polite"></div>' +
+          '<div class="extend" id="extendBar" hidden></div>' +
+          '<div class="composer"><button type="button" class="icon-btn" id="custAttach" aria-label="画像を送る">＋</button><textarea id="custInput" rows="1" aria-label="メッセージ"></textarea><button type="button" class="send" id="custSend">送信</button></div>';
+      }
+    }
+    return '';
+  }
+
+  function render(opt){
+    opt = opt || {};
+    const sc = $('screen');
+    $('navTitle').textContent = TITLES[S.step];
+    $('backBtn').hidden = !BACK[S.step];
+    sc.classList.toggle('chatmode', S.step === 'chat');
+    const paint = () => { sc.innerHTML = screenHtml(); if (S.step === 'chat') renderChat(); };
+    if (opt.move){
+      paint(); sc.scrollTop = 0;
+      if (opt.userAction) sc.focus({preventScroll:true});
+    } else {
+      keepFocus(sc, paint);
+    }
+    renderConsent();
+    syncTimers();
+  }
+
+  function renderConsent(){
+    const show = S.step === 'home' && !S.consent;
+    $('consent').hidden = !show;
+    $('screen').inert = show;
+    $('backBtn').inert = show;
+  }
+
+  function msgsHtml(s, viewer){
+    return s.msgs.map(m => {
+      if (m.from === 'sys') return '<div class="sys' + (m.warn ? ' warn' : '') + '">' + esc(m.text) + '</div>';
+      const mine = viewer === 'cust' ? m.from === 'cust' : m.from === 'doc';
+      let who = '';
+      if (!mine) who = m.from === 'doc' ? '医師 佐藤' : s.who + 'さん';
+      else if (viewer === 'admin' && m.auto) who = '自動のあいさつ（設定の文）';
+      const av = (!mine && m.from === 'doc') ? '<span class="avatar xs" aria-hidden="true">佐</span>' : '';
+      return '<div class="row ' + (mine ? 'me' : 'them') + '">' + av + '<div class="msg ' + (mine ? 'me' : 'them') + (m.img && !m.text ? ' img-only' : '') + '">' + (who ? '<span class="who">' + esc(who) + '</span>' : '') + esc(m.text) + (m.img ? '<span class="img" role="img" aria-label="添付画像（例）"></span>' : '') + '</div></div>';
+    }).join('');
+  }
+
+  function renderChat(){
+    const s = byId(S.viewId); if (!s || S.step !== 'chat') return;
+    const cm = $('custMsgs');
+    if (s.status === 'before' || s.status === 'waiting'){
+      cm.innerHTML = '<div class="locked">相談は <b>' + esc(range(s)) + '</b> に始まります<div class="big">開始前</div>時間になると入力できるようになり、<br>先生からのあいさつが届きます</div>';
+    } else {
+      cm.innerHTML = msgsHtml(s, 'cust');
+    }
+    cm.scrollTop = cm.scrollHeight;
+    $('custLen').textContent = s.minutes + '分';
+    const open = isOpen(s);
+    ['custInput','custSend','custAttach'].forEach(id => { $(id).disabled = !open; });
+    $('custInput').placeholder = open ? 'メッセージを入力' : (s.status === 'closed' ? '相談は終了しました' : '開始時刻まで入力できません');
+    const bar = $('extendBar');
+    keepFocus(bar, () => {
+      if (open && s.mine){
+        bar.hidden = false;
+        bar.innerHTML = '<span>時間が足りないときは</span><button type="button" class="btn small secondary" data-act="extendReq"' + (s.extendReq ? ' disabled' : '') + '>' + (s.extendReq ? '延長を希望しました' : '延長したい') + '</button>';
+      } else if (s.status === 'closed'){
+        bar.hidden = false;
+        bar.innerHTML = '<span>やりとりはいつでも見返せます</span><button type="button" class="btn small secondary" data-act="home">マイページへ</button>';
+      } else { bar.hidden = true; bar.innerHTML = ''; }
+    });
+    syncTimers();
+  }
+
+  function timerHtml(s){
+    if (!s) return {cls:'', html:''};
+    switch (s.status){
+      case 'before': return {cls:'', html:'<span>開始 ' + esc(range(s)) + '</span><span>' + s.minutes + '分</span>'};
+      case 'waiting': return {cls:'last', html:'<span>今すぐ相談の依頼（応答待ち）</span><span>締め切りまで <b>' + mmss(s.waitRemain) + '</b></span>'};
+      case 'open': case 'last': return {cls:s.status, html:'<span>' + (s.status === 'last' ? 'まもなく終了' : '相談中') + '</span><span>残り <b>' + mmss(s.remain) + '</b></span>'};
+      case 'closed': return {cls:'closed', html:'<span>終了しました</span><span>閲覧のみ</span>'};
+      case 'nores': return {cls:'closed', html:'<span>応答なし（依頼は終わりました）</span><span>チケットは使っていません</span>'};
+      case 'canceled': return {cls:'closed', html:'<span>キャンセルされました</span><span>' + (s.charged && s.kind === 'book' ? 'チケットは戻しました' : 'チケットは使っていません') + '</span>'};
+    }
+    return {cls:'', html:''};
+  }
+
+  function syncTimers(){
+    const ct = $('custTimer');
+    if (ct){ const t = timerHtml(byId(S.viewId)); ct.className = 'timer ' + t.cls; ct.innerHTML = t.html; }
+    const at = $('adminTimer'), as = byId(S.adminSel);
+    if (at && as && as.method === 'chat'){ const t = timerHtml(as); at.className = 'timer ' + t.cls; at.innerHTML = t.html; }
+    const wl = $('waitLeft'), ws = byId(S.viewId);
+    if (wl && ws) wl.textContent = mmss(ws.waitRemain);
+    if (S.step === 'home') S.sessions.forEach(x => { if (x.mine && isOpen(x)) { const el = document.querySelector('[data-left="' + x.id + '"]'); if (el) el.textContent = mmss(x.remain); } });
+    const aw = $('adminWaitLeft');
+    if (aw && as) aw.textContent = mmss(as.waitRemain);
+  }
+
+  // ---------- 先生の管理画面 ----------
+  const PILL = {before:['wait','開始前'], waiting:['now','依頼中'], open:['open','相談中'], last:['last','残り5分'], closed:['done','終了'], nores:['done','応答なし'], canceled:['done','キャンセル']};
+  const RANK = {waiting:0, open:1, last:1, before:2, closed:3, nores:4, canceled:5};
+
+  function renderAdmin(){
+    const admin = $('admin');
+    keepFocus(admin, paintAdmin);
+  }
+
+  function paintAdmin(){
+    const list = S.sessions.slice().sort((a, b) => RANK[a.status] - RANK[b.status]);
+    $('adminList').innerHTML = list.map(s => {
+      const p = PILL[s.status];
+      return '<button type="button" class="item' + (s.status === 'waiting' ? ' alert' : '') + '" data-id="' + s.id + '" aria-current="' + (S.adminSel === s.id) + '">' +
+        '<span class="n"><span>' + esc(s.who) + 'さん</span><span class="pill ' + p[0] + '">' + p[1] + '</span></span>' +
+        '<span class="tags"><span class="tag ' + s.kind + '">' + (s.kind === 'now' ? '今すぐ' : '予約') + '</span><span class="tag">' + METHOD[s.method] + '</span></span>' +
+        '<span class="s">' + esc(range(s)) + '・' + s.minutes + '分</span></button>';
+    }).join('');
+
+    const s = byId(S.adminSel) || list[0];
+    S.adminSel = s.id;
+    const p = PILL[s.status];
+    $('roomName').textContent = s.who + 'さん';
+    $('roomPill').className = 'pill ' + p[0]; $('roomPill').textContent = p[1];
+    $('roomSub').textContent = (s.kind === 'now' ? '今すぐ相談' : '予約') + '・' + METHOD[s.method] + '・' + range(s) + '（' + s.minutes + '分・' + nTk(s.minutes) + '枚）・残りチケット ' + leftOf(s) + '枚';
+
+    let actions = '';
+    if (s.status === 'waiting') actions = '<button type="button" class="btn small" data-aact="start">開始する</button>';
+    else if (isOpen(s) && s.method === 'chat') actions = '<button type="button" class="btn small secondary" data-aact="extend"' + (leftOf(s) < 1 ? ' disabled title="チケットが残っていません"' : '') + '>延長（＋30分・1枚）</button><button type="button" class="btn small danger" data-aact="end">終了する</button>';
+    $('roomActions').innerHTML = actions;
+
+    const al = $('roomAlert');
+    if (s.status === 'waiting'){ al.hidden = false; al.innerHTML = '今すぐ相談の依頼です。「開始する」を押すとチャットが始まり、チケットを1枚使います（締め切りまで <span id="adminWaitLeft">' + mmss(s.waitRemain) + '</span>）'; }
+    else if (s.extendReq && isOpen(s)){ al.hidden = false; al.textContent = s.who + 'さんから延長の希望が届いています（残りチケット ' + leftOf(s) + '枚）'; }
+    else { al.hidden = true; al.innerHTML = ''; }
+
+    $('intakeBody').innerHTML = (s.kind === 'now' ? [FIELDS[0]] : FIELDS).map(f =>
+      '<dt>' + f[1] + '</dt><dd>' + (esc((s.form[f[0]] || '').trim()) || '—') + '</dd>').join('') +
+      (s.kind === 'now' ? '<dt>そのほか</dt><dd class="muted">今すぐ相談のため、相談したいことだけ聞いています</dd>' : '');
+
+    const chat = s.method === 'chat';
+    $('adminTimer').hidden = !chat; $('adminMsgs').hidden = !chat; $('adminComposer').hidden = !chat;
+    $('callInfo').hidden = chat;
+    if (chat){
+      const am = $('adminMsgs');
+      const empty = {
+        before:'開始前です。時間になると最初のあいさつが自動で入り、ここでやりとりできます',
+        waiting:'「開始する」を押すとチャットが始まり、最初のあいさつが自動で入ります',
+        nores:'10分以内に応答がなかったため、顧問先には「ただいま対応できません。予約をご利用ください」と出ています。チケットは使っていません',
+        canceled:'この相談はキャンセルされました'
+      }[s.status];
+      am.innerHTML = s.msgs.length ? msgsHtml(s, 'admin') : '<div class="sys">' + esc(empty || '') + '</div>';
+      am.scrollTop = am.scrollHeight;
+      const can = isOpen(s);
+      ['adminInput','adminSend','adminAttach'].forEach(id => { $(id).disabled = !can; });
+      $('adminInput').placeholder = can ? '返信を入力' : '相談中だけ返信できます';
+    } else {
+      const open = isOpen(s);
+      $('callInfo').innerHTML = s.method === 'zoom'
+        ? '<div class="box"><b>Zoom で相談</b>' + (open ? '開始時刻になったので、顧問先のマイページに先生の Zoom の URL を出しています。' : '開始時刻になると、顧問先のマイページに先生の Zoom の URL（固定）が出ます。') + '<div class="url" style="margin-top:6px">' + esc(ZOOM_URL) + '</div></div>'
+        : '<div class="box"><b>電話で相談</b>' + (open ? '開始時刻です。顧問先の登録の番号におかけください。' : '開始時刻になったら、先生から顧問先の登録の番号におかけください。') + '<div style="margin-top:6px">登録の番号：' + esc(TEL) + '</div></div>';
+      $('callInfo').innerHTML += '<p class="small muted">' + (s.status === 'closed' ? 'この相談は終了しました。' : '相談用の Google カレンダーにも「' + esc(s.who) + 'さん 相談（' + METHOD[s.method] + '）」の予定が入っています。') + '</p>';
     }
     syncTimers();
   }
 
-  // ---------- チャット共通 ----------
-  function send(from, text, withImg){
-    text = (text||'').trim();
-    if (!isOpen() || (!text && !withImg)) return;
-    S.msgs.push({from:from, text:text, img:!!withImg});
-    if (from==='them') S.discord.unshift(S.name+'さん（'+S.minutes+'分・残り'+mmss(S.remain)+'）: '+(withImg?'［画像］':'')+text);
-    renderChat(); renderAdmin();
-  }
-  function bubbles(viewer){
-    var sys = [];
-    if (S.phase!=='before') sys.push('<div class="sys">'+S.slot+' チャットが開きました（'+S.minutes+'分）</div>');
-    var out = sys.concat(S.msgs.map(function(m){
-      var mine = (viewer==='customer' ? m.from==='them' : m.from==='me');
-      var who = m.from==='me' ? '先生' : S.name;
-      return '<div class="msg '+(mine?'me':'them')+'"><span class="who">'+esc(who)+'</span>'+esc(m.text)+(m.img?'<span class="img" role="img" aria-label="添付画像（例）"></span>':'')+'</div>';
-    }));
-    if (S.phase==='last') out.push('<div class="sys">残り5分です</div>');
-    if (S.phase==='closed') out.push('<div class="sys">'+endTime()+' チャットは終了しました。やりとりはいつでも見返せます</div>');
-    return out.join('');
-  }
-  function renderChat(){
-    var cm = $('custMsgs'); if (cm){ cm.innerHTML = bubbles('customer') || ''; cm.scrollTop = cm.scrollHeight; }
-    var lk = $('locked'); if (lk) lk.innerHTML = 'チャットは <b>10/20(火) '+S.slot+'</b> に開きます<div class="big">開始前</div>時間になると自動で入力できるようになります';
-    var ci=$('custInput'), cs=$('custSend'), ab=$('attachBtn');
-    [ci,cs,ab].forEach(function(e){ if(e) e.disabled = !isOpen(); });
-    if (ci) ci.placeholder = isOpen() ? 'メッセージを入力' : (S.phase==='closed' ? 'チャットは終了しました' : '開始時刻まで入力できません');
-  }
-  function timerHtml(){
-    if (S.phase==='before') return {cls:'', html:'<span>開始 10/20(火) '+S.slot+'</span><span>'+S.minutes+'分</span>'};
-    if (S.phase==='closed') return {cls:'closed', html:'<span>終了しました（'+S.slot+'〜'+endTime()+'）</span><span>閲覧のみ</span>'};
-    return {cls: S.phase==='last' ? 'last' : 'open', html:'<span>'+(S.phase==='last'?'まもなく終了':'チャット中')+'</span><span>残り <b>'+mmss(S.remain)+'</b></span>'};
-  }
-  function syncTimers(){
-    var t = timerHtml();
-    ['custTimer','adminTimer'].forEach(function(id){ var el=$(id); if(el){ el.className='timer '+t.cls; el.innerHTML=t.html; } });
+  function renderLine(){
+    $('lineFeed').innerHTML = S.line.map(n =>
+      '<div class="ln"><span class="ln-ic" aria-hidden="true">通</span><div class="ln-b"><div class="ln-t">【' + esc(n.t) + '】' + (n.ex ? '<span class="ex">（例）</span>' : '') + '</div><div>' + esc(n.b) + '</div>' + (n.c ? '<div class="ln-c">' + esc(n.c) + '</div>' : '') + '</div></div>').join('');
   }
 
-  // ---------- 管理画面 ----------
-  function statusPill(){
-    if (S.step==='menu' || S.step==='pay') return ['wait','予約前'];
-    return ({before:['wait','開始前'], open:['open','チャット中'], last:['last','残り5分'], closed:['done','終了']})[S.phase];
+  function renderAccept(){
+    $('acceptSw').setAttribute('aria-checked', String(S.accepting));
+    $('acceptTxt').textContent = S.accepting ? '受付中' : '停止中';
+    $('acceptTxt').className = 'state ' + (S.accepting ? 'on' : 'off');
   }
-  function renderAdmin(){
-    var p = statusPill();
-    var items = [
-      {n:S.name+'さん', s:'10/20 '+S.slot+'〜'+endTime()+'・'+S.minutes+'分', pill:p},
-      {n:'鈴木 花子さん', s:'10/20 16:00〜16:30・30分', pill:['wait','開始前']}
-    ];
-    $('adminList').innerHTML = items.map(function(it,i){ return '<button type="button" class="item" data-i="'+i+'" aria-current="'+(S.adminSel===i)+'"><span class="n">'+esc(it.n)+'<span class="pill '+it.pill[0]+'">'+it.pill[1]+'</span></span><span class="s">'+esc(it.s)+'</span></button>'; }).join('');
-    $('adminList').querySelectorAll('.item').forEach(function(b){ b.onclick=function(){ S.adminSel=+b.dataset.i; renderAdmin(); }; });
-    var cur = items[S.adminSel];
-    $('roomName').textContent = cur.n;
-    $('roomSub').textContent = cur.s + (S.adminSel===0 ? (S.step==='menu'||S.step==='pay' ? '・未払い' : '・支払い済み（例 '+yen(PRICE[S.minutes])+'）') : '・支払い済み（例 3,300円）');
-    $('roomPill').className = 'pill '+cur.pill[0]; $('roomPill').textContent = cur.pill[1];
-    var am = $('adminMsgs');
-    if (S.adminSel===0) { am.innerHTML = bubbles('admin') || '<div class="sys">開始前です。時間になると、ここでやりとりできます</div>'; }
-    else { am.innerHTML = '<div class="sys">16:00 に開きます</div>'; }
-    am.scrollTop = am.scrollHeight;
-    var canReply = S.adminSel===0 && isOpen();
-    $('adminInput').disabled = !canReply; $('adminSend').disabled = !canReply;
-    $('adminInput').placeholder = canReply ? '返信を入力' : 'チャット中だけ返信できます';
-    $('discordFeed').innerHTML = S.discord.length ? S.discord.slice(0,3).map(function(d){ return '<div class="row"><span class="ic">!</span><span>新着：'+esc(d)+'</span></div>'; }).join('') : '<span class="empty">お客様がメッセージを送ると、ここに通知の例が出ます</span>';
-    syncTimers();
+
+  function markSeg(){
+    const s = byId(S.activeId);
+    const ph = !s ? null : ({before:'before', waiting:'before', open:'open', last:'last', closed:'closed'})[s.status] || null;
+    $('phaseSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.phase === ph)));
   }
-  $('adminSend').onclick=function(){ send('me', $('adminInput').value); $('adminInput').value=''; };
+
+  // 顧問先の画面が「マイページ」のときは状態の変化を反映する
+  function refresh(){
+    if (S.step === 'chat') renderChat();
+    else if (S.step === 'home') render();
+    renderAdmin(); markSeg();
+  }
+
+  // ---------- 相談の開始・終了 ----------
+  function openSession(s, ph){
+    if (['closed','nores','canceled'].includes(s.status)){ s.msgs = []; s.extendReq = false; }
+    if (s.kind === 'now' && !s.charged){ if (s.mine) S.left = Math.max(0, S.left - 1); s.charged = true; }
+    if (!s.msgs.length){
+      s.msgs.push({from:'sys', text:s.date + ' ' + s.slot + ' 相談が始まりました（' + s.minutes + '分）'});
+      if (s.method === 'chat') s.msgs.push({from:'doc', auto:true, text:greeting(s)});
+    }
+    const wasLast = s.status === 'last';
+    s.status = ph;
+    s.remain = ph === 'last' ? 300 : s.minutes * 60;
+    if (ph === 'last' && !wasLast) s.msgs.push({from:'sys', warn:true, text:'残り5分です'});
+  }
+
+  function closeSession(s, byDoc){
+    s.status = 'closed'; s.remain = 0; s.extendReq = false;
+    s.msgs.push({from:'sys', text:(byDoc ? '先生が相談を終了しました。' : '時間になったので相談は終了しました。') + 'やりとりはマイページからいつでも見返せます'});
+  }
+
+  function exampleBooking(){
+    const minutes = S.left >= 2 ? 60 : 30;
+    const s = mk({who:ME, mine:true, kind:'book', method:'chat', date:'10/20(火)', slot:'14:00', minutes:minutes, charged:true, form:Object.assign({}, SAMPLE)});
+    S.left = Math.max(0, S.left - nTk(minutes));
+    S.sessions.unshift(s);
+    S.consent = true;
+    notify('予約が入りました', ME + 'さん／' + range(s) + '／チャット・' + minutes + '分（' + nTk(minutes) + '枚）／相談：' + trunc(s.form.what, 28), '相談用カレンダーにも「' + ME + 'さん 相談（チャット）」の予定を入れました');
+    return s;
+  }
+
+  function setPhase(ph){
+    let s = byId(S.activeId);
+    if (!s || ['canceled','nores'].includes(s.status)) s = exampleBooking();
+    S.activeId = s.id; S.adminSel = s.id;
+    if (ph === 'before'){
+      s.msgs = []; s.extendReq = false; s.remain = s.minutes * 60;
+      if (s.kind === 'now'){ s.status = 'waiting'; s.waitRemain = 600; } else s.status = 'before';
+    } else if (ph === 'open' || ph === 'last'){
+      openSession(s, ph);
+    } else if (ph === 'closed'){
+      if (s.status === 'closed') { /* そのまま */ }
+      else { if (!isOpen(s)) openSession(s, 'open'); closeSession(s, false); }
+    }
+    if (s.method === 'chat'){
+      S.viewId = s.id;
+      S.step = (s.kind === 'now' && s.status === 'waiting') ? 'wait' : 'chat';
+    } else S.step = 'home';
+    render({move:true}); renderAdmin(); markSeg();
+  }
+
+  function tick(){
+    let changed = false;
+    S.sessions.forEach(s => {
+      if (s.status === 'waiting'){
+        s.waitRemain--;
+        if (s.waitRemain <= 0) noResponse(s);
+      } else if (isOpen(s)){
+        s.remain--;
+        if (s.remain <= 0){ closeSession(s, false); changed = true; }
+        else if (s.remain <= 300 && s.status === 'open'){ s.status = 'last'; s.msgs.push({from:'sys', warn:true, text:'残り5分です'}); changed = true; }
+      }
+    });
+    if (changed) refresh(); else syncTimers();
+  }
+
+  function noResponse(s){
+    s.status = 'nores';
+    if (S.step === 'wait' && S.viewId === s.id){ S.step = 'nores'; render({move:true}); }
+    else if (S.step === 'home') render();
+    renderAdmin(); markSeg();
+  }
+
+  function sendMsg(from, text, img){
+    const s = from === 'cust' ? byId(S.viewId) : byId(S.adminSel);
+    text = (text || '').trim();
+    if (!s || !isOpen(s) || (!text && !img)) return false;
+    s.msgs.push({from:from, text:text, img:!!img});
+    if (from === 'cust') notify('新着メッセージ', s.who + 'さん（相談中・残り' + mmss(s.remain) + '）：' + (img ? '［画像］' : '') + trunc(text, 40), '先生が管理画面を開いていないときだけ届きます');
+    if (S.step === 'chat' && S.viewId === s.id) renderChat();
+    renderAdmin();
+    return true;
+  }
+
+  // ---------- 顧問先の操作 ----------
+  const go = step => { S.step = step; render({move:true, userAction:true}); };
+
+  function act(a, b){
+    const d = S.draft;
+    switch (a){
+      case 'book':
+        S.draft = {method:'chat', minutes:30, day:0, slot:null, form:{}}; go('how'); break;
+      case 'now': S.nowText = ''; go('now'); break;
+      case 'home': go('home'); break;
+      case 'method': d.method = b.dataset.v; render(); break;
+      case 'len': d.minutes = +b.dataset.v; d.slot = null; render(); break;
+      case 'day': d.day = +b.dataset.v; d.slot = null; render(); break;
+      case 'slot': d.slot = b.dataset.v; render(); break;
+      case 'fill': d.form = Object.assign({}, SAMPLE); render(); { const n = $('formNext'); if (n) n.focus({preventScroll:true}); } break;
+      case 'fillNow': S.nowText = SAMPLE_NOW; render(); { const n = $('nowNext'); if (n) n.focus({preventScroll:true}); } break;
+      case 'next': {
+        if (S.step === 'how'){ if (nTk(d.minutes) > S.left) d.minutes = 30; go('len'); }
+        else if (S.step === 'len') go('time');
+        else if (S.step === 'time' && d.slot) go('form');
+        else if (S.step === 'form' && (d.form.what || '').trim()) go('confirm');
+        break;
+      }
+      case 'confirm': {
+        const n = nTk(d.minutes);
+        if (n > S.left) return;
+        const s = mk({who:ME, mine:true, kind:'book', method:d.method, date:DAYS[d.day].d, slot:d.slot, minutes:d.minutes, charged:true, form:Object.assign({}, d.form)});
+        S.sessions.unshift(s); S.left -= n;
+        S.lastBooked = s.id; S.activeId = s.id; S.adminSel = s.id;
+        notify('予約が入りました', ME + 'さん／' + range(s) + '／' + METHOD[s.method] + '・' + s.minutes + '分（' + n + '枚）／相談：' + trunc(s.form.what, 28), '相談用カレンダーにも「' + ME + 'さん 相談（' + METHOD[s.method] + '）」の予定を入れました');
+        go('done'); renderAdmin(); markSeg();
+        break;
+      }
+      case 'cancel': {
+        const s = byId(b.dataset.id); if (!s || s.status !== 'before') return;
+        s.status = 'canceled'; S.left += nTk(s.minutes);
+        notify('キャンセル', s.who + 'さん／' + range(s) + '／' + METHOD[s.method] + '（チケット' + nTk(s.minutes) + '枚を戻しました）');
+        render(); renderAdmin(); markSeg();
+        break;
+      }
+      case 'openChat': S.viewId = b.dataset.id; go('chat'); break;
+      case 'toWait': S.viewId = b.dataset.id; go('wait'); break;
+      case 'sendNow': {
+        const text = S.nowText.trim(); if (!text) return;
+        const s = mk({who:ME, mine:true, kind:'now', method:'chat', date:'今日', slot:'13:10', minutes:30, status:'waiting', waitRemain:600, form:{what:text}});
+        S.sessions.unshift(s);
+        S.activeId = s.id; S.adminSel = s.id; S.viewId = s.id; S.nowText = '';
+        notify('今すぐ相談の依頼', ME + 'さん「' + trunc(text, 40) + '」', '10分以内に管理画面で「開始する」を押すと始まります（残りチケット ' + S.left + '枚）');
+        go('wait'); renderAdmin(); markSeg();
+        break;
+      }
+      case 'cancelNow': {
+        const s = byId(S.viewId); if (!s) return;
+        s.status = 'canceled';
+        notify('今すぐ相談の取り消し', s.who + 'さんが依頼を取り消しました');
+        go('home'); renderAdmin(); markSeg();
+        break;
+      }
+      case 'timeout': { const s = byId(S.viewId); if (s && s.status === 'waiting') noResponse(s); break; }
+      case 'extendReq': {
+        const s = byId(S.viewId); if (!s || !isOpen(s) || s.extendReq) return;
+        s.extendReq = true;
+        s.msgs.push({from:'sys', text:'延長の希望を先生に送りました（延長するかは先生が決めます・30分＝チケット1枚）'});
+        notify('延長の希望', s.who + 'さんが延長を希望しています（残り' + mmss(s.remain) + '・残りチケット ' + S.left + '枚）', '管理画面の「延長（＋30分・1枚）」で延長できます');
+        renderChat(); renderAdmin();
+        break;
+      }
+    }
+  }
+
+  $('screen').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || b.disabled) return;
+    if (b.dataset.act) return act(b.dataset.act, b);
+    if (b.id === 'custSend'){ if (sendMsg('cust', $('custInput').value)) $('custInput').value = ''; }
+    else if (b.id === 'custAttach') sendMsg('cust', '', true);
+  });
+  $('screen').addEventListener('input', e => {
+    const f = e.target.dataset && e.target.dataset.field; if (!f) return;
+    if (f === 'now'){ S.nowText = e.target.value; const n = $('nowNext'); if (n) n.disabled = !S.nowText.trim(); }
+    else { S.draft.form[f] = e.target.value; const n = $('formNext'); if (n) n.disabled = !(S.draft.form.what || '').trim(); }
+  });
+  $('backBtn').addEventListener('click', () => { if (BACK[S.step]) go(BACK[S.step]); });
+  $('consentBtn').addEventListener('click', () => {
+    S.consent = true; renderConsent();
+    const first = $('screen').querySelector('[data-act="book"]'); if (first) first.focus({preventScroll:true});
+  });
+
+  // ---------- 先生の操作 ----------
+  $('admin').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || b.disabled) return;
+    if (b.classList.contains('item')){ S.adminSel = b.dataset.id; renderAdmin(); return; }
+    const s = byId(S.adminSel); if (!s) return;
+    switch (b.dataset.aact){
+      case 'start':
+        if (s.status !== 'waiting') return;
+        openSession(s, 'open'); S.activeId = s.id;
+        if (S.viewId === s.id && (S.step === 'wait' || S.step === 'home')){ S.step = 'chat'; render({move:true}); }
+        else if (S.step === 'home') render();
+        renderAdmin(); markSeg(); return;
+      case 'extend': {
+        if (!isOpen(s) || leftOf(s) < 1) return;
+        if (s.mine) S.left--; else s.left--;
+        s.minutes += 30; s.remain += 1800; s.extendReq = false;
+        if (s.status === 'last' && s.remain > 300) s.status = 'open';
+        s.msgs.push({from:'sys', text:'先生が30分延長しました（チケット1枚・残り' + leftOf(s) + '枚）'});
+        refresh(); return;
+      }
+      case 'end':
+        if (!isOpen(s)) return;
+        closeSession(s, true); refresh(); return;
+    }
+  });
+  $('adminSend').addEventListener('click', () => { if (sendMsg('doc', $('adminInput').value)) $('adminInput').value = ''; });
+  $('adminAttach').addEventListener('click', () => sendMsg('doc', '参考の図です', true));
+  $('acceptSw').addEventListener('click', () => {
+    S.accepting = !S.accepting; renderAccept();
+    if (S.step === 'home') render();
+  });
 
   // ---------- 時間のシミュレーション ----------
-  function setPhase(ph){
-    S.phase = ph;
-    clearInterval(S.tick);
-    if (ph==='open') S.remain = S.minutes*60;
-    if (ph==='last') S.remain = 5*60;
-    if (ph==='closed') S.remain = 0;
-    if (isOpen()) S.tick = setInterval(function(){ S.remain--; if (S.remain<=300 && S.phase==='open'){ S.phase='last'; markSeg(); renderChat(); renderAdmin(); } if (S.remain<=0){ setPhase('closed'); } syncTimers(); }, 1000);
-    if (isOpen() && S.msgs.length===0) S.msgs.push({from:'me', text:'本日はよろしくお願いします！ご相談内容をどうぞ。', img:false});
-    markSeg();
-    if (S.step==='chat') render(); else renderChat();
-    renderAdmin();
-  }
-  function markSeg(){ $('phaseSeg').querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.phase===S.phase)); }); }
-  $('phaseSeg').querySelectorAll('button').forEach(function(b){ b.onclick=function(){ if (S.step!=='chat'){ S.step='chat'; } setPhase(b.dataset.phase); }; });
-  $('backBtn').onclick=function(){ S.step='menu'; render(); renderAdmin(); };
-  $('resetBtn').onclick=function(){ clearInterval(S.tick); S.step='menu'; S.minutes=60; S.slot='14:00'; S.name='山田 太郎'; S.phase='before'; S.remain=3600; S.msgs=[]; S.discord=[]; S.adminSel=0; markSeg(); render(); renderAdmin(); };
+  $('phaseSeg').addEventListener('click', e => { const b = e.target.closest('button[data-phase]'); if (b) setPhase(b.dataset.phase); });
+  $('resetBtn').addEventListener('click', () => {
+    initState(); $('adminInput').value = '';
+    render({move:true}); renderAdmin(); renderLine(); renderAccept(); markSeg();
+  });
 
-  render(); renderAdmin();
+  initState();
+  render(); renderAdmin(); renderLine(); renderAccept(); markSeg();
+  setInterval(tick, 1000);
 })();
 </script>
 
