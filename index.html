@@ -122,11 +122,7 @@
   .rv-st.on{color:var(--ok)}
   .rv-when{font-weight:700; margin-top:6px; font-variant-numeric:tabular-nums}
   .rv p{margin:6px 0 8px; font-size:13px; color:var(--muted)}
-  .rv .pending{background:var(--soft); border-radius:10px; padding:8px 10px; color:var(--ink)}
-  .rv .join{background:var(--ok-soft); border-radius:10px; padding:8px 10px; margin:6px 0 4px; color:var(--ink); font-size:13px}
-  .rv .join .k{font-size:12px; color:var(--ok); font-weight:700}
   .rv .linkbtn{display:block}
-  .url{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; word-break:break-all; color:var(--accent)}
   .empty-cell{margin:0 16px 10px; padding:12px; border:1px dashed var(--line); border-radius:12px; color:var(--muted); font-size:13px; text-align:center}
 
   .steps{list-style:none; display:flex; gap:4px; margin:0; padding:12px 16px 2px}
@@ -239,9 +235,6 @@
   .intake dl{margin:0; padding:0 14px 10px; display:grid; grid-template-columns:auto minmax(0,1fr); gap:3px 12px; font-size:12.5px; max-height:168px; overflow:auto}
   .intake dt{color:var(--muted); white-space:nowrap}
   .intake dd{margin:0; word-break:break-word}
-  .callinfo{flex:1; padding:16px; font-size:13px; overflow:auto}
-  .callinfo .box{border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--soft)}
-  .callinfo .box b{display:block; margin-bottom:4px}
   .line-feed{border-top:1px solid var(--line); background:var(--soft); padding:10px 14px 14px}
   .line-feed .h{font-weight:700; font-size:12.5px; color:var(--notify)}
   .line-feed .hs{font-size:11.5px; color:var(--muted)}
@@ -256,7 +249,6 @@
     .list{border-right:0; border-bottom:1px solid var(--line); max-height:290px}
     .room{height:auto}
     .room .msgs{flex:none; min-height:260px; max-height:380px}
-    .callinfo{flex:none}
   }
 
   .notes{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
@@ -270,13 +262,13 @@
 <div class="wrap">
   <div class="intro">
     <span class="badge">モック（見た目と流れの確認用）</span>
-    <h1>時間制相談 モック（チャット・Zoom・電話）</h1>
+    <h1>時間制相談 モック</h1>
     <p>佐藤先生の顧問先が、月ごとのチケット（30分＝1枚）の範囲で先生に相談する仕組みの画面イメージです。左が顧問先のスマホ（マイページ）、右が先生の管理画面です（スマホでは上下に並びます）。「予約する」「今すぐ相談する」から流れをたどれます。「時間を進める」を押すと、開始前・開始・残り5分・終了後の違いを見られます。実際の予約・送信・決済はしません。名前・日付・枚数・文章はすべて例です。</p>
     <div class="assume" aria-label="このモックの前提（10/10の打合せの内容）">
       <span><b>前提</b>（10/10の打合せの内容）</span>
       <span>30分＝チケット1枚</span>
       <span>システムでは決済しない（月の顧問料に含む）</span>
-      <span>チャット・Zoom・電話から選ぶ</span>
+      <span>相談はチャット（Zoom・電話は必要になったら追加）</span>
       <span>予約の前に問診票</span>
       <span>今すぐ相談は先生が受付中のときだけ</span>
       <span>先生への通知は LINE グループ＋Google カレンダー</span>
@@ -344,7 +336,6 @@
             </details>
             <div class="timer" id="adminTimer"></div>
             <div class="msgs" id="adminMsgs" aria-live="polite"></div>
-            <div class="callinfo" id="callInfo" hidden></div>
             <div class="composer" id="adminComposer">
               <button type="button" class="icon-btn" id="adminAttach" aria-label="画像を送る">＋</button>
               <textarea id="adminInput" rows="1" aria-label="返信" placeholder="返信を入力"></textarea>
@@ -368,7 +359,6 @@
       <li>先生の写真・紹介文・最初のあいさつは例です（写真の代わりに「佐」のアイコンを出しています）</li>
       <li>空き時間は、相談用の Google カレンダーで先生が「相談可」と入れた時間から 30 分刻みで出す想定です（このモックの枠は例）</li>
       <li>予約は開始の1時間前まで・60日先まで。キャンセルは開始の1時間前までならマイページからでき、チケットは戻ります</li>
-      <li>Zoom は先生の固定の URL を表示する形から始めます。Zoom の URL・電話番号はどちらも例です</li>
       <li>利用規約・プライバシーポリシーの文面はこれから用意します</li>
       <li>顧問先のマイページは、顧問先ごとの専用 URL（ログイン不要）で開く想定です</li>
     </ul>
@@ -389,15 +379,6 @@
   // ---------- 例のデータ ----------
   const ME = '山田 太郎';
   const TOTAL = 6;
-  const ZOOM_URL = 'https://zoom.us/j/0000000000（例）';
-  const TEL = '090-0000-0000（例）';
-  const METHOD = {chat:'チャット', zoom:'Zoom', phone:'電話'};
-  const METHOD_SUB = {chat:'文字・画像でやりとり', zoom:'先生の Zoom に入る', phone:'先生からお電話'};
-  const METHOD_NOTE = {
-    chat:'時間になるとチャットが開き、文字・画像でやりとりします。',
-    zoom:'時間になると、マイページに先生の Zoom の URL が出ます。',
-    phone:'時間になると、先生から登録の電話番号にお電話します。'
-  };
   const LENS = [30, 60, 90];
   const DAYS = [
     {d:'10/20(火)', blocks:[['10:00','12:00'], ['14:00','17:00']]},
@@ -419,7 +400,7 @@
   const greeting = s => '医師の佐藤です。' + (s.kind === 'now' ? 'ご相談の内容' : '問診票') + 'を拝見しました。本日はよろしくお願いします。気になっていることを、もう少し詳しく教えてください。';
 
   let seq = 0;
-  const mk = o => Object.assign({id:'s' + (++seq), kind:'book', method:'chat', minutes:30, status:'before', form:{}, msgs:[], remain:0, waitRemain:600, extendReq:false, charged:false, mine:false, left:0}, o);
+  const mk = o => Object.assign({id:'s' + (++seq), kind:'book', minutes:30, status:'before', form:{}, msgs:[], remain:0, waitRemain:600, extendReq:false, charged:false, mine:false, left:0}, o);
 
   const S = {};
   function initState(){
@@ -433,16 +414,25 @@
       {from:'doc', text:'寝る前の過ごし方を一緒に見直してみましょう。まずは寝る1時間前から画面を見ない形で、1週間ためしてみてください。'},
       {from:'sys', text:'20:30 相談は終了しました。やりとりはマイページからいつでも見返せます'}
     ];
-    const o1 = mk({who:'鈴木 花子', method:'zoom', date:'10/20(火)', slot:'16:00', minutes:30, left:3, charged:true,
+    const o1 = mk({who:'鈴木 花子', date:'10/20(火)', slot:'16:00', minutes:30, left:3, charged:true,
       form:{what:'季節の変わり目で肌荒れが続いている。食事で気をつけることを知りたい', since:'2週間ほど前から', meds:'なし', allergy:'金属', other:''}});
-    const o2 = mk({who:'佐々木 健', method:'phone', date:'10/21(水)', slot:'19:00', minutes:60, left:1, charged:true,
+    const o2 = mk({who:'佐々木 健', date:'10/21(水)', slot:'19:00', minutes:60, left:1, charged:true,
       form:{what:'健康診断で血圧が高めと言われた。運動と食事の相談をしたい', since:'今年の健康診断から', meds:'なし', allergy:'なし', other:'平日は夜しか時間が取れません'}});
+    const o3 = mk({who:'高橋 美咲', date:'10/16(金)', slot:'12:00', minutes:30, status:'closed', left:2, charged:true,
+      form:{what:'在宅勤務で運動不足。間食が増えて体重が気になる', since:'半年ほど前から', meds:'なし', allergy:'なし', other:''}});
+    o3.msgs = [
+      {from:'sys', text:'10/16(金) 12:00 相談が始まりました（30分）'},
+      {from:'doc', auto:true, text:greeting(o3)},
+      {from:'cust', text:'夕方になると甘いものをつい食べてしまいます。'},
+      {from:'doc', text:'昼食の量とタイミングを見直すと、夕方の空腹がやわらぐことがあります。まずは1週間、食べた時間をメモしてみましょう。'},
+      {from:'sys', text:'12:30 相談は終了しました。やりとりはマイページからいつでも見返せます'}
+    ];
     Object.assign(S, {
       step:'home', consent:false, accepting:true, left:4,
-      draft:{method:'chat', minutes:30, day:0, slot:null, form:{}},
+      draft:{minutes:30, day:0, slot:null, form:{}},
       nowText:'', viewId:null, activeId:null, adminSel:o1.id, lastBooked:null,
-      sessions:[past, o1, o2],
-      line:[{t:'予約が入りました', ex:true, b:'鈴木 花子さん／10/20(火) 16:00〜16:30／Zoom・30分（1枚）／相談：季節の変わり目で肌荒れが続いている…', c:'相談用カレンダーにも「鈴木 花子さん 相談（Zoom）」の予定を入れました'}]
+      sessions:[past, o1, o2, o3],
+      line:[{t:'予約が入りました', ex:true, b:'鈴木 花子さん／10/20(火) 16:00〜16:30／30分（1枚）／相談：季節の変わり目で肌荒れが続いている…', c:'相談用カレンダーにも「鈴木 花子さん 相談（チャット）」の予定を入れました'}]
     });
   }
 
@@ -491,9 +481,9 @@
   }
 
   // ---------- 顧問先の画面 ----------
-  const FLOW = [['how','しかた'], ['len','長さ'], ['time','日時'], ['form','問診票'], ['confirm','確認']];
-  const TITLES = {home:'マイページ', how:'予約する', len:'予約する', time:'予約する', form:'予約する', confirm:'予約する', done:'予約完了', now:'今すぐ相談', wait:'今すぐ相談', nores:'今すぐ相談', chat:'相談チャット'};
-  const BACK = {how:'home', len:'how', time:'len', form:'time', confirm:'form', now:'home', nores:'home', chat:'home'};
+  const FLOW = [['len','長さ'], ['time','日時'], ['form','問診票'], ['confirm','確認']];
+  const TITLES = {home:'マイページ', len:'予約する', time:'予約する', form:'予約する', confirm:'予約する', done:'予約完了', now:'今すぐ相談', wait:'今すぐ相談', nores:'今すぐ相談', chat:'相談チャット'};
+  const BACK = {len:'home', time:'len', form:'time', confirm:'form', now:'home', nores:'home', chat:'home'};
 
   function stepsHtml(cur){
     const i = FLOW.findIndex(f => f[0] === cur);
@@ -508,28 +498,18 @@
   function cardHtml(s){
     const st = custStatus(s);
     let body = '';
-    if (s.method === 'chat'){
-      if (s.status === 'waiting') body = '<p>先生の応答を待っています（最大10分）</p><button type="button" class="btn small secondary" data-act="toWait" data-id="' + s.id + '">待っている画面を開く</button>';
-      else body = '<p>' + (isOpen(s) ? '相談中です。チャットを開いてやりとりできます' : '時間になると、ここからチャットに入れます') + '</p><button type="button" class="btn small' + (isOpen(s) ? '' : ' secondary') + '" data-act="openChat" data-id="' + s.id + '">チャットを開く</button>';
-    } else if (s.method === 'zoom'){
-      body = isOpen(s)
-        ? '<div class="join"><div class="k">先生の Zoom の URL</div><div class="url">' + esc(ZOOM_URL) + '</div><div class="small muted">開始時刻になりました。この URL から入ってください（モックのため開きません）</div></div>'
-        : '<p class="pending">時間になったらここに Zoom の URL が出ます</p>';
-    } else {
-      body = isOpen(s)
-        ? '<div class="join"><div class="k">お電話中</div>先生から登録の番号（' + esc(TEL) + '）にお電話しています</div>'
-        : '<p class="pending">時間になったら先生からお電話します（登録の番号 ' + esc(TEL) + '）</p>';
-    }
+    if (s.status === 'waiting') body = '<p>先生の応答を待っています（最大10分）</p><button type="button" class="btn small secondary" data-act="toWait" data-id="' + s.id + '">待っている画面を開く</button>';
+    else body = '<p>' + (isOpen(s) ? '相談中です。チャットを開いてやりとりできます' : '時間になると、ここからチャットに入れます') + '</p><button type="button" class="btn small' + (isOpen(s) ? '' : ' secondary') + '" data-act="openChat" data-id="' + s.id + '">チャットを開く</button>';
     const cancel = (s.kind === 'book' && s.status === 'before')
       ? '<button type="button" class="linkbtn" data-act="cancel" data-id="' + s.id + '">キャンセルする（チケット' + nTk(s.minutes) + '枚が戻ります）</button>' : '';
-    return '<div class="rv"><div class="rv-top"><span class="tag ' + s.kind + '">' + (s.kind === 'now' ? '今すぐ' : '予約') + '</span><span class="tag">' + METHOD[s.method] + '</span><span class="rv-st ' + st[1] + '">' + st[0] + (isOpen(s) ? '・残り <span data-left="' + s.id + '">' + mmss(s.remain) + '</span>' : '') + '</span></div>' +
+    return '<div class="rv"><div class="rv-top"><span class="tag ' + s.kind + '">' + (s.kind === 'now' ? '今すぐ' : '予約') + '</span><span class="rv-st ' + st[1] + '">' + st[0] + (isOpen(s) ? '・残り <span data-left="' + s.id + '">' + mmss(s.remain) + '</span>' : '') + '</span></div>' +
       '<div class="rv-when">' + esc(range(s)) + '（' + s.minutes + '分・' + nTk(s.minutes) + '枚）</div>' + body + cancel + '</div>';
   }
 
   function pastHtml(s){
-    return '<div class="rv"><div class="rv-top"><span class="tag ' + s.kind + '">' + (s.kind === 'now' ? '今すぐ' : '予約') + '</span><span class="tag">' + METHOD[s.method] + '</span><span class="rv-st">終了</span></div>' +
+    return '<div class="rv"><div class="rv-top"><span class="tag ' + s.kind + '">' + (s.kind === 'now' ? '今すぐ' : '予約') + '</span><span class="rv-st">終了</span></div>' +
       '<div class="rv-when">' + esc(range(s)) + '（' + s.minutes + '分）</div>' +
-      (s.method === 'chat' ? '<p>' + esc(trunc(s.form.what, 28)) + '</p><button type="button" class="btn small secondary" data-act="openChat" data-id="' + s.id + '">やりとりを見返す</button>' : '<p>' + METHOD[s.method] + 'で相談しました</p>') + '</div>';
+      '<p>' + esc(trunc(s.form.what, 28)) + '</p><button type="button" class="btn small secondary" data-act="openChat" data-id="' + s.id + '">やりとりを見返す</button></div>';
   }
 
   function homeHtml(){
@@ -563,18 +543,13 @@
     const d = S.draft;
     switch (S.step){
       case 'home': return homeHtml();
-      case 'how':
-        return stepsHtml('how') + '<div class="sec">相談のしかた</div>' +
-          '<div class="choice" role="group" aria-label="相談のしかた">' + ['chat','zoom','phone'].map(m =>
-            '<button type="button" data-act="method" data-v="' + m + '" aria-pressed="' + (d.method === m) + '"><div class="m">' + METHOD[m] + '</div><div class="p">' + METHOD_SUB[m] + '</div></button>').join('') + '</div>' +
-          '<p class="note">' + METHOD_NOTE[d.method] + '</p>' +
-          '<div class="cta"><button type="button" class="btn" data-act="next">次へ（長さを選ぶ）</button></div>';
       case 'len':
         return stepsHtml('len') + '<div class="sec">相談する長さ</div>' +
           '<div class="choice" role="group" aria-label="相談する長さ">' + LENS.map(m => {
             const n = nTk(m), dis = n > S.left;
             return '<button type="button" data-act="len" data-v="' + m + '" aria-pressed="' + (d.minutes === m) + '"' + (dis ? ' disabled' : '') + '><div class="m">' + m + '分</div><div class="p">' + (dis ? 'チケットが足りません' : 'チケット' + n + '枚') + '</div></button>';
           }).join('') + '</div>' +
+          '<p class="note">相談はチャットで行います。時間になるとチャットが開き、文字・画像でやりとりできます。</p>' +
           '<p class="note">いまの残りは <b>' + S.left + '枚</b> です。この画面でのお支払いはありません（月の顧問料に含まれています）。</p>' +
           '<div class="cta"><button type="button" class="btn" data-act="next">次へ（日時を選ぶ）</button></div>';
       case 'time': {
@@ -598,7 +573,6 @@
         const n = nTk(d.minutes), day = DAYS[d.day].d;
         const others = FIELDS.slice(1).filter(f => (d.form[f[0]] || '').trim()).map(f => '<div class="sub">' + f[1] + '：' + esc(trunc(d.form[f[0]], 40)) + '</div>').join('');
         return stepsHtml('confirm') +
-          '<div class="cell"><div class="k">相談のしかた</div><div class="v">' + METHOD[d.method] + '</div></div>' +
           '<div class="cell"><div class="k">日時</div><div class="v">' + day + ' ' + d.slot + '〜' + toHM(toMin(d.slot) + d.minutes) + '（' + d.minutes + '分）</div></div>' +
           '<div class="cell"><div class="k">問診票</div><div class="v">' + esc(trunc(d.form.what, 70)) + '</div>' + others + '</div>' +
           '<div class="use"><b>チケットを ' + n + ' 枚使います</b><span>残り ' + S.left + ' 枚 → ' + (S.left - n) + ' 枚</span></div>' +
@@ -607,14 +581,9 @@
       }
       case 'done': {
         const s = byId(S.lastBooked);
-        const howto = {
-          chat:'<b>チャットで相談</b>時間になったら、マイページの「チャットを開く」から入れます。先生からのあいさつが届いたら始まりです。',
-          zoom:'<b>Zoom で相談</b>時間になったら、マイページに Zoom の URL が出ます。そこから入ってください。',
-          phone:'<b>電話で相談</b>時間になったら先生からお電話します（登録の番号 ' + esc(TEL) + '）。'
-        }[s.method];
+        const howto = '<b>チャットで相談</b>時間になったら、マイページの「チャットを開く」から入れます。先生からのあいさつが届いたら始まりです。';
         return '<div class="done-head"><span class="done-icon" aria-hidden="true">✓</span><h2>予約しました</h2><p>チケットを ' + nTk(s.minutes) + ' 枚使いました（残り ' + S.left + ' 枚）</p></div><div class="band"></div>' +
           '<div class="cell"><div class="k">日時</div><div class="v">' + esc(range(s)) + '（' + s.minutes + '分）</div></div>' +
-          '<div class="cell"><div class="k">相談のしかた</div><div class="v">' + METHOD[s.method] + '</div></div>' +
           '<div class="howto">' + howto + '</div>' +
           '<div class="cta"><button type="button" class="btn" data-act="home">マイページに戻る</button><div class="help">予約の内容はマイページでいつでも確認できます</div></div>';
       }
@@ -726,7 +695,7 @@
     const ct = $('custTimer');
     if (ct){ const t = timerHtml(byId(S.viewId)); ct.className = 'timer ' + t.cls; ct.innerHTML = t.html; }
     const at = $('adminTimer'), as = byId(S.adminSel);
-    if (at && as && as.method === 'chat'){ const t = timerHtml(as); at.className = 'timer ' + t.cls; at.innerHTML = t.html; }
+    if (at && as){ const t = timerHtml(as); at.className = 'timer ' + t.cls; at.innerHTML = t.html; }
     const wl = $('waitLeft'), ws = byId(S.viewId);
     if (wl && ws) wl.textContent = mmss(ws.waitRemain);
     if (S.step === 'home') S.sessions.forEach(x => { if (x.mine && isOpen(x)) { const el = document.querySelector('[data-left="' + x.id + '"]'); if (el) el.textContent = mmss(x.remain); } });
@@ -749,7 +718,7 @@
       const p = PILL[s.status];
       return '<button type="button" class="item' + (s.status === 'waiting' ? ' alert' : '') + '" data-id="' + s.id + '" aria-current="' + (S.adminSel === s.id) + '">' +
         '<span class="n"><span>' + esc(s.who) + 'さん</span><span class="pill ' + p[0] + '">' + p[1] + '</span></span>' +
-        '<span class="tags"><span class="tag ' + s.kind + '">' + (s.kind === 'now' ? '今すぐ' : '予約') + '</span><span class="tag">' + METHOD[s.method] + '</span></span>' +
+        '<span class="tags"><span class="tag ' + s.kind + '">' + (s.kind === 'now' ? '今すぐ' : '予約') + '</span></span>' +
         '<span class="s">' + esc(range(s)) + '・' + s.minutes + '分</span></button>';
     }).join('');
 
@@ -758,11 +727,11 @@
     const p = PILL[s.status];
     $('roomName').textContent = s.who + 'さん';
     $('roomPill').className = 'pill ' + p[0]; $('roomPill').textContent = p[1];
-    $('roomSub').textContent = (s.kind === 'now' ? '今すぐ相談' : '予約') + '・' + METHOD[s.method] + '・' + range(s) + '（' + s.minutes + '分・' + nTk(s.minutes) + '枚）・残りチケット ' + leftOf(s) + '枚';
+    $('roomSub').textContent = (s.kind === 'now' ? '今すぐ相談' : '予約') + '・' + range(s) + '（' + s.minutes + '分・' + nTk(s.minutes) + '枚）・残りチケット ' + leftOf(s) + '枚';
 
     let actions = '';
     if (s.status === 'waiting') actions = '<button type="button" class="btn small" data-aact="start">開始する</button>';
-    else if (isOpen(s) && s.method === 'chat') actions = '<button type="button" class="btn small secondary" data-aact="extend"' + (leftOf(s) < 1 ? ' disabled title="チケットが残っていません"' : '') + '>延長（＋30分・1枚）</button><button type="button" class="btn small danger" data-aact="end">終了する</button>';
+    else if (isOpen(s)) actions = '<button type="button" class="btn small secondary" data-aact="extend"' + (leftOf(s) < 1 ? ' disabled title="チケットが残っていません"' : '') + '>延長（＋30分・1枚）</button><button type="button" class="btn small danger" data-aact="end">終了する</button>';
     $('roomActions').innerHTML = actions;
 
     const al = $('roomAlert');
@@ -774,29 +743,18 @@
       '<dt>' + f[1] + '</dt><dd>' + (esc((s.form[f[0]] || '').trim()) || '—') + '</dd>').join('') +
       (s.kind === 'now' ? '<dt>そのほか</dt><dd class="muted">今すぐ相談のため、相談したいことだけ聞いています</dd>' : '');
 
-    const chat = s.method === 'chat';
-    $('adminTimer').hidden = !chat; $('adminMsgs').hidden = !chat; $('adminComposer').hidden = !chat;
-    $('callInfo').hidden = chat;
-    if (chat){
-      const am = $('adminMsgs');
-      const empty = {
-        before:'開始前です。時間になると最初のあいさつが自動で入り、ここでやりとりできます',
-        waiting:'「開始する」を押すとチャットが始まり、最初のあいさつが自動で入ります',
-        nores:'10分以内に応答がなかったため、顧問先には「ただいま対応できません。予約をご利用ください」と出ています。チケットは使っていません',
-        canceled:'この相談はキャンセルされました'
-      }[s.status];
-      am.innerHTML = s.msgs.length ? msgsHtml(s, 'admin') : '<div class="sys">' + esc(empty || '') + '</div>';
-      am.scrollTop = am.scrollHeight;
-      const can = isOpen(s);
-      ['adminInput','adminSend','adminAttach'].forEach(id => { $(id).disabled = !can; });
-      $('adminInput').placeholder = can ? '返信を入力' : '相談中だけ返信できます';
-    } else {
-      const open = isOpen(s);
-      $('callInfo').innerHTML = s.method === 'zoom'
-        ? '<div class="box"><b>Zoom で相談</b>' + (open ? '開始時刻になったので、顧問先のマイページに先生の Zoom の URL を出しています。' : '開始時刻になると、顧問先のマイページに先生の Zoom の URL（固定）が出ます。') + '<div class="url" style="margin-top:6px">' + esc(ZOOM_URL) + '</div></div>'
-        : '<div class="box"><b>電話で相談</b>' + (open ? '開始時刻です。顧問先の登録の番号におかけください。' : '開始時刻になったら、先生から顧問先の登録の番号におかけください。') + '<div style="margin-top:6px">登録の番号：' + esc(TEL) + '</div></div>';
-      $('callInfo').innerHTML += '<p class="small muted">' + (s.status === 'closed' ? 'この相談は終了しました。' : '相談用の Google カレンダーにも「' + esc(s.who) + 'さん 相談（' + METHOD[s.method] + '）」の予定が入っています。') + '</p>';
-    }
+    const am = $('adminMsgs');
+    const empty = {
+      before:'開始前です。時間になると最初のあいさつが自動で入り、ここでやりとりできます',
+      waiting:'「開始する」を押すとチャットが始まり、最初のあいさつが自動で入ります',
+      nores:'10分以内に応答がなかったため、顧問先には「ただいま対応できません。予約をご利用ください」と出ています。チケットは使っていません',
+      canceled:'この相談はキャンセルされました'
+    }[s.status];
+    am.innerHTML = s.msgs.length ? msgsHtml(s, 'admin') : '<div class="sys">' + esc(empty || '') + '</div>';
+    am.scrollTop = am.scrollHeight;
+    const can = isOpen(s);
+    ['adminInput','adminSend','adminAttach'].forEach(id => { $(id).disabled = !can; });
+    $('adminInput').placeholder = can ? '返信を入力' : '相談中だけ返信できます';
     syncTimers();
   }
 
@@ -830,7 +788,7 @@
     if (s.kind === 'now' && !s.charged){ if (s.mine) S.left = Math.max(0, S.left - 1); s.charged = true; }
     if (!s.msgs.length){
       s.msgs.push({from:'sys', text:s.date + ' ' + s.slot + ' 相談が始まりました（' + s.minutes + '分）'});
-      if (s.method === 'chat') s.msgs.push({from:'doc', auto:true, text:greeting(s)});
+      s.msgs.push({from:'doc', auto:true, text:greeting(s)});
     }
     const wasLast = s.status === 'last';
     s.status = ph;
@@ -845,7 +803,7 @@
 
   function exampleBooking(){
     const minutes = S.left >= 2 ? 60 : 30;
-    const s = mk({who:ME, mine:true, kind:'book', method:'chat', date:'10/20(火)', slot:'14:00', minutes:minutes, charged:true, form:Object.assign({}, SAMPLE)});
+    const s = mk({who:ME, mine:true, kind:'book', date:'10/20(火)', slot:'14:00', minutes:minutes, charged:true, form:Object.assign({}, SAMPLE)});
     S.left = Math.max(0, S.left - nTk(minutes));
     S.sessions.unshift(s);
     S.consent = true;
@@ -866,10 +824,8 @@
       if (s.status === 'closed') { /* そのまま */ }
       else { if (!isOpen(s)) openSession(s, 'open'); closeSession(s, false); }
     }
-    if (s.method === 'chat'){
-      S.viewId = s.id;
-      S.step = (s.kind === 'now' && s.status === 'waiting') ? 'wait' : 'chat';
-    } else S.step = 'home';
+    S.viewId = s.id;
+    S.step = (s.kind === 'now' && s.status === 'waiting') ? 'wait' : 'chat';
     render({move:true}); renderAdmin(); markSeg();
   }
 
@@ -913,18 +869,16 @@
     const d = S.draft;
     switch (a){
       case 'book':
-        S.draft = {method:'chat', minutes:30, day:0, slot:null, form:{}}; go('how'); break;
+        S.draft = {minutes:30, day:0, slot:null, form:{}}; go('len'); break;
       case 'now': S.nowText = ''; go('now'); break;
       case 'home': go('home'); break;
-      case 'method': d.method = b.dataset.v; render(); break;
       case 'len': d.minutes = +b.dataset.v; d.slot = null; render(); break;
       case 'day': d.day = +b.dataset.v; d.slot = null; render(); break;
       case 'slot': d.slot = b.dataset.v; render(); break;
       case 'fill': d.form = Object.assign({}, SAMPLE); render(); { const n = $('formNext'); if (n) n.focus({preventScroll:true}); } break;
       case 'fillNow': S.nowText = SAMPLE_NOW; render(); { const n = $('nowNext'); if (n) n.focus({preventScroll:true}); } break;
       case 'next': {
-        if (S.step === 'how'){ if (nTk(d.minutes) > S.left) d.minutes = 30; go('len'); }
-        else if (S.step === 'len') go('time');
+        if (S.step === 'len') go('time');
         else if (S.step === 'time' && d.slot) go('form');
         else if (S.step === 'form' && (d.form.what || '').trim()) go('confirm');
         break;
@@ -932,17 +886,17 @@
       case 'confirm': {
         const n = nTk(d.minutes);
         if (n > S.left) return;
-        const s = mk({who:ME, mine:true, kind:'book', method:d.method, date:DAYS[d.day].d, slot:d.slot, minutes:d.minutes, charged:true, form:Object.assign({}, d.form)});
+        const s = mk({who:ME, mine:true, kind:'book', date:DAYS[d.day].d, slot:d.slot, minutes:d.minutes, charged:true, form:Object.assign({}, d.form)});
         S.sessions.unshift(s); S.left -= n;
         S.lastBooked = s.id; S.activeId = s.id; S.adminSel = s.id;
-        notify('予約が入りました', ME + 'さん／' + range(s) + '／' + METHOD[s.method] + '・' + s.minutes + '分（' + n + '枚）／相談：' + trunc(s.form.what, 28), '相談用カレンダーにも「' + ME + 'さん 相談（' + METHOD[s.method] + '）」の予定を入れました');
+        notify('予約が入りました', ME + 'さん／' + range(s) + '／' + s.minutes + '分（' + n + '枚）／相談：' + trunc(s.form.what, 28), '相談用カレンダーにも「' + ME + 'さん 相談（チャット）」の予定を入れました');
         go('done'); renderAdmin(); markSeg();
         break;
       }
       case 'cancel': {
         const s = byId(b.dataset.id); if (!s || s.status !== 'before') return;
         s.status = 'canceled'; S.left += nTk(s.minutes);
-        notify('キャンセル', s.who + 'さん／' + range(s) + '／' + METHOD[s.method] + '（チケット' + nTk(s.minutes) + '枚を戻しました）');
+        notify('キャンセル', s.who + 'さん／' + range(s) + '（チケット' + nTk(s.minutes) + '枚を戻しました）');
         render(); renderAdmin(); markSeg();
         break;
       }
@@ -950,7 +904,7 @@
       case 'toWait': S.viewId = b.dataset.id; go('wait'); break;
       case 'sendNow': {
         const text = S.nowText.trim(); if (!text) return;
-        const s = mk({who:ME, mine:true, kind:'now', method:'chat', date:'今日', slot:'13:10', minutes:30, status:'waiting', waitRemain:600, form:{what:text}});
+        const s = mk({who:ME, mine:true, kind:'now', date:'今日', slot:'13:10', minutes:30, status:'waiting', waitRemain:600, form:{what:text}});
         S.sessions.unshift(s);
         S.activeId = s.id; S.adminSel = s.id; S.viewId = s.id; S.nowText = '';
         notify('今すぐ相談の依頼', ME + 'さん「' + trunc(text, 40) + '」', '10分以内に管理画面で「開始する」を押すと始まります（残りチケット ' + S.left + '枚）');
